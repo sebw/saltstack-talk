@@ -45,8 +45,11 @@ sebastien.wains@gmail.com
 
 - efficacité
 - stabilité
+- contrôle
 - suivi
+- documentation
 - visibilité
+- compliance
 - ...
 
 ---
@@ -105,7 +108,7 @@ Utilisateurs :
 - Pas d'utilisation de packages, ou alors trouvés sur rpmfind et autres
 - Aucune gestion des mises à jour
 - Des services SSH, NTP, SMTP, DNS mal ou pas configurés
-- Des inconsistences entre environnements d'un même projet (`service alfresco start` en ACC, `service tomcat start` en PRD) ou des configurations backend d'un même cluster
+- Des inconsistences entre environnements d'un même projet ou nodes d'un même cluster
 - Pas d'authentification centralisée
 - Services sécurisés par SSL self-signed ou pas du tout
 - Installation OS entièrement à la main depuis l'ISO qui traine sur un PC
@@ -118,17 +121,36 @@ Utilisateurs :
 
 # Un peu d'histoire
 
-#### Par où commencer ?
+## Par où commencer ?
+
+#### Les challenges techniques
 
 - La situation est critique partout
-- Il faut définir des standards et nouvelles méthodes de travail
-- Conscientiser le management afin de dégager des ressources
-- Dire "non tu ne seras plus root en production" à quasi tout le monde
-- Il faut améliorer la manière d'installer les nouveaux serveurs et leurs configurations
-- Et migrer, migrer, migrer les anciens !
-- Mais aussi travailler sur les nouveaux projets 
+- Il faut définir : 
+  - des standards
+  - des politiques de sécurité, de mises à jours
+  - des nouvelles méthodes de travail
+- Il faut :
+  - améliorer le processus de création de nouveaux serveurs
+  - et de leur configurations
+- Et migrer, migrer, migrer le legacy !
+- En plus de travailler sur les nouveaux projets
 
-# :scream:
+#### Les challenges ne sont pas que techniques
+
+---
+
+# Il faut faire face à la résistance au changement
+
+## Des accès root en prod ?
+
+![150%](./img/root.jpg)
+
+---
+
+## L'accueil n'a pas toujours été chaleureux
+
+![150%](./img/devs-without-root.jpg)
 
 ---
 
@@ -182,7 +204,7 @@ Et je ne gère que le strict minimum !
 
 #### Premiers tests en mai 2013
 
-- un serveur `salt-master` pour gérer tous les clients `salt-minion`
+- un serveur `salt-master` pour gérer les premiers clients `salt-minion`
 - gestion de configuration de services de base  pour commencer (SSH, SMTP, NTP)
 - remote execution (`yum upgrade x`, `uptime`)
 - récupération d'informations sur le parc (CPU, mémoire, version OS)
@@ -214,7 +236,8 @@ Et je ne gère que le strict minimum !
 - Installation d'un agent (salt-minion)
 - Agent et ses dépendances (Python, ZeroMQ, msgpack) éparpillés dans les dépôts (Redhat, EPEL)
 - Master et minion doivent être obligatoirement à la même version
-- Faille de sécurité importante (PKI)
+- Language déclaratif (ordre d'exécution aléatoire si pas de dépendances entre actions)
+- Faille de sécurité importante (PKI, regénération clé master)
 - Pas de support Python 3
 - Installation de Salt-API impossible
 - Pull requests acceptés 5 minutes montre en main
@@ -232,7 +255,8 @@ Et je ne gère que le strict minimum !
 
 - Toujours pas de support Python 3
 - SaltStack fourni des dépôts avec toutes les dépendances [0]
-- Le support de Windows et MacOS est avancé
+- Le support de Windows et MacOS a bien avancé
+- Impératif ET déclaratif
 - Ils ont engagé une équipe de testeurs : moins de releases, quasi plus de régressions
 - Salt SSH pour gérer les "dumb" devices qui embarquent Python 2.6 ou plus
 - Salt Proxy pour gérer les "super dumb" devices n'embarquant pas de stack Python
@@ -316,15 +340,17 @@ Et je ne gère que le strict minimum !
 
 # Installation
 
-Un master contrôle plusieurs minions.
+#### Sur chaque serveur :
+
+`yum install https://repo.saltstack.com/yum/redhat/salt-repo-latest-1.el7.noarch.rpm`
 
 #### Sur le master :
 
-`yum install salt-master`
+`yum install salt-master --enablerepo=saltstack`
 
 #### Sur les minions :
 
-`yum install salt-minion`
+`yum install salt-minion --enablerepo=saltstack`
 
 
 ---
@@ -408,13 +434,13 @@ def ping():
 
 # Rappel avant d'écrire nos premières lignes de code
 
-Le code qu'on va développer est au service de l'infrastructure (un bug dans le code = un downtime possible)
+Le code qu'on va développer est au service de l'infrastructure (un bug dans le code = un downtime éventuel)
 
 Les bonnes pratiques de développement s'appliquent ! Définir des guidelines de développement (syntaxe, structure des fichiers, etc.)
 
 Système de contrôle de versions (SVN, Git, Mercurial) avec un workflow de développement
 
-Ne rien pousser en production qui n'a pas été testé et validé
+Ne rien pousser en production qui n'a pas été testé et validé (principe des 4 yeux)
 
 Et surtout :
 
@@ -482,8 +508,8 @@ Notre manifest d'installation :
 
 ```yaml
 [root@salt-master ~]# cat /srv/salt/states/motd/init.sls
-motd:                            <-- ID unique
-  file.managed                   <-- module.fonction (comme dans Python)
+ma_conf_motd:                    <-- ID unique
+  file.managed:                  <-- module.fonction (comme dans Python)
     - name: /etc/motd            <-- le fichier géré
     - source: salt://motd/motd.jinja   <-- template à utiliser
     - template: jinja            <-- type de template
@@ -546,7 +572,7 @@ Appliquons la configuration avec `state.highstate` :
 [root@salt-master ~]# salt 'salt-minion' state.highstate
 salt-minion:
 ----------
-          ID: motd
+          ID: ma_conf_motd
     Function: file.managed
         Name: /etc/motd
       Result: True
@@ -598,6 +624,7 @@ postfix-pkg:
 
 postfix-service:
   service.running:
+    - name: postfix
     - enable: True
     - reload: False
     - require:
@@ -618,7 +645,25 @@ postfix-conf:
 
 ![bg 70%](./img/bg.png)
 
+# Impératif ET déclaratif
+
+Impératif : 
+- Salt exécute les actions dans l'ordre de définition
+- plus simple à écrire mais moins fléxible
+
+Déclaratif : 
+- on défini les dépendances entre les actions
+- modèle plus puissant et fléxible mais attention au spaghetti code
+
+[https://docs.saltstack.com/en/getstarted/flexibility.html](https://docs.saltstack.com/en/getstarted/flexibility.html)
+
+---
+
+![bg 70%](./img/bg.png)
+
 # Portabilité du code entre OS
+
+Les modules se chargent de "deviner" les utilitaires à utiliser.
 
 `pkg.installed` utilisera le gestionnaire de package du système : `yum`, `apt`, `zypper`, etc.
 `service.running` démarra le service via ce qu'il trouve parmi `sysVinit`, `systemd`, `upstart`.
@@ -627,9 +672,7 @@ postfix-conf:
 
 Noms de packages différents entre distributions (`apache2` vs `httpd`) ?
 
-Map files YAML !
-
-
+Map files ! (ressemble fortement à un template jinja)
 
 ---
 
@@ -687,9 +730,9 @@ role-{{ i }}-conf:
 
 # Définir un grain automatiquement
 
-Il est possible de récupérer des informations provenant de différentes sources (CMDB, LDAP, DB, API, tc.) et de les stocker dans un grain du minion.
+Il est possible de récupérer des informations provenant de différentes sources (CMDB, LDAP, DB, API) et de les stocker dans des grains de nos minions.
 
-Cette info sera rappatriée au démarrage du minion ou alors via la commande `saltutil.sync_grains`
+Mise à jour au runtime ou `saltutil.sync_grains`
 
 Ce script Python sera placé sous `/srv/salt/states/_grains/satellite.py`
 
@@ -731,9 +774,9 @@ frank:
     - host: localhost
     - password: bobcat
 ```
-Le mot de passe est en clair et va donc se retrouver en cache sur le minion sous `/var/cache/salt/minions/files/base/mysql-users/init.sls`
+Ce fichier sera mis en cache sur les minions sous `/var/cache/salt/minions/files/base/mysql-users/init.sls`
 
-Cependant depuis n'importe quel autre minion non concerné par ce state, on peut exécuter `salt-call state.sls mysql-users` (pull). Le state sera rappatrié, exécuté, et stocké en cache.
+#### Problème de sécurité
 
 Les pillars ne sont jamais conservés en cache !
 
@@ -745,19 +788,44 @@ Les pillars ne sont jamais conservés en cache !
 
 Alternative avec utilisation d'un pillar :
 
+/srv/salt/pillars/mysql/init.sls
+```
+mysql:
+ frank:
+   password: bobcat
+```
+/srv/salt/states/mysql/init.sls
 ```
 frank:
   mysql_user.present:
     - host: localhost
-    - password: {{ salt['pillar.get']('mysq:user:frank') }}
+    - password: {{ salt['pillar.get']('mysq:frank:password'), 'defaut' }}
 ```
 
 Rappel :
 
-**Les pillars sont là pour stocker des informations sensibles et ne sont jamais stockés sur les minions.**
+- Les pillars sont conçus pour stocker des informations sensibles 
+- Ils ne sont jamais stockés sur les minions
+- Limiter leur utilisation aux données sensibles
+- Problème de performances potentiel si trop de pillars (pas dans la doc !)
 
-**Chaque pillar présenté à un minion provoque l'ouverture d'un canal dédié et sécurisé entre le master et le minion, que le pillar soit appelé ou non dans un template. Il ne faut donc pas abuser des pillars sous peine de soucis de performances.**
+---
 
+![bg 70%](./img/bg.png)
+
+# Différentes syntaxes pour faire la même chose ?
+
+#### Grains
+
+`{{ grains['ROLE'}}`
+`{{ salt['grains.get']('ROLE', None) }}`
+
+#### Pillars
+
+`{{ pillar['PWD'}}`
+`{{ salt['pillar.get']('PWD', None) }}`
+
+Privilégier la méthode `salt['module.function']` plus avancée et permettant de définir des valeurs par défaut si la variable recherchée n'existe pas.
 
 ---
 
@@ -771,7 +839,7 @@ Rappel :
 
 ![bg 70%](./img/bg.png)
 
-# Questions ?
+# Questions / réponses
 
 ---
 
