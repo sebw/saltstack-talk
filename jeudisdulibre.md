@@ -9,7 +9,7 @@
 ![](./img/logo.png)
 
 
-## La gestion de configuration simple et puissante
+## Une nouvelle approche à la gestion d'infrastructure
 
 _Les Jeudis du Libre, Mons_
 _20/04/2017_ **TODO**
@@ -36,6 +36,21 @@ sebastien.wains@gmail.com
 #### Red Hat Certified Engineer sous RHEL4
 
 #### Contributeur à différents projets Open Source, principalement Salt et Rundeck aujourd'hui
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Que permet Salt ?
+
+- exécution distance (sa fonction première en 2011)
+- gestion de configuration
+- récupération d'informations
+- orchestration
+- monitoring
+- provisioning
+- auto-scaling
+- compliance
 
 ---
 
@@ -176,9 +191,7 @@ $ wc -l install_rhel.sh
 664 install_rhel.sh
 ```
 
-Et je ne gère que le strict minimum !
-
-
+Et je ne gère alors que le strict minimum !
 
 ---
 
@@ -204,7 +217,9 @@ Et je ne gère que le strict minimum !
 
 #### Premiers tests en mai 2013
 
-- un serveur `salt-master` pour gérer les premiers clients `salt-minion`
+- deux principaux types de noeuds : 
+  - un serveur `salt-master` 
+  - des clients `salt-minion`
 - gestion de configuration de services de base  pour commencer (SSH, SMTP, NTP)
 - remote execution (`yum upgrade x`, `uptime`)
 - récupération d'informations sur le parc (CPU, mémoire, version OS)
@@ -218,9 +233,12 @@ Et je ne gère que le strict minimum !
 # Les avantages (en 2013)
 
 - Orchestration "event-driven" via un `event bus` sur le master
+- Haute disponibilité du rôle `salt-master` possible
 - Ecrit en Python avec des possibilités d'extensions intéressantes
 - YAML et Jinja (mais attention à la syntaxe !)
-- Modèle client/serveur (`minion`/`master`)
+- Modèle client/serveur (`salt-minion`/`salt-master`)
+- `salt-syndic` pour les grosses infrastructures ("proxy")
+- Mode masterless possible (données sur le minion)
 - Mode push ET pull
 - Début d'un support de Windows
 - Gestion de configuration, remote execution, facts dans un seul package
@@ -233,18 +251,20 @@ Et je ne gère que le strict minimum !
 
 # Les inconvénients (en 2013)
 
-- Installation d'un agent (salt-minion)
+- Installation d'un agent (salt-minion) qui doit être dans la même version que le salt-master (pas d'aligment Debian/RedHat)
 - Agent et ses dépendances (Python, ZeroMQ, msgpack) éparpillés dans les dépôts (Redhat, EPEL)
-- Master et minion doivent être obligatoirement à la même version
 - Language déclaratif (ordre d'exécution aléatoire si pas de dépendances entre actions)
-- Faille de sécurité importante (PKI, regénération clé master)
-- Pas de support Python 3
-- Installation de Salt-API impossible
-- Pull requests acceptés 5 minutes montre en main
+- Donne l'impression de partir un peu dans tous les sens : 
+  - tout est en chantier, rien n'est abouti
+  - installation de Salt-API impossible 
+  - pas de support VMware dans Salt-Cloud
+  - pull requests acceptés 5 minutes montre en main
+  - régressions occasionnelles
+  - faille de sécurité (dont une critique dans la PKI)
 - Release cycle "Chuck Norris"
-- Régressions régulières
 - Quelques gros bugs :
-  - `reload: True` qui fait un restart du service --> plus d'internet pour 5000 utilisateurs pendant le restart de 4 nodes Squid
+  - `reload: True` qui fait un restart du service au lieu d'un reload
+    -  plus d'internet pour 5000 utilisateurs pendant le restart de 4 nodes Squid
   - ZeroMQ sous RHEL5 qui provoque la perte régulière des minions
 
 ---
@@ -253,7 +273,7 @@ Et je ne gère que le strict minimum !
 
 # Salt aujourd'hui
 
-- Toujours pas de support Python 3
+- Pas de support Python 3
 - SaltStack fourni des dépôts avec toutes les dépendances [0]
 - Le support de Windows et MacOS a bien avancé
 - Impératif ET déclaratif
@@ -307,14 +327,10 @@ Et je ne gère que le strict minimum !
 `minion` : serveur géré  
 `modules` : module d'exécution ayant différentes fonctions (ex : file.managed)
 `states` : état de configuration (package installé, fichier configuré, service démarré, etc.)  
-`grains` : informations relativement statiques d'un minion  
-`pillar` : information dynamique stockée sur le master à disposition des minions 
-`beacons` : fonctionnalité permettant de monitorer des processus hors Salt (charge système, RAM, fichier, nombre de sessions HAproxy, etc.) et envoyer des messages sur l'`event bus`  
-`reactors` : action déclenchée en réaction à un évenement sur l'`event bus`  
-`top.sls` : défini quels `states` et `pillars` sont appliqués sur quels minions  
-`init.sls` : manifest d'un `state`, `pillar`  
-
-:heavy_exclamation_mark: Curieusement dans la documentation et la configuration, SaltStack parle de `states` et `grains` (pluriel) mais de `pillar` (singulier)
+`grains` : informations relativement statiques des minions  
+`pillar` : informations dynamiques stockées sur le master à disposition des minions pour lesquelles elles sont définies
+`top.sls` : les fichiers d'assignation de `states` et `pillars` aux minions  
+`init.sls` : manifest d'un `state`, `pillar` 
 
 ---
 
@@ -322,7 +338,23 @@ Et je ne gère que le strict minimum !
 
 # Fonctionnement de base
 
-#### Mode client/server
+#### Glossaire
+
+`beacons` : fonctionnalité permettant de monitorer des processus hors Salt (charge système, RAM, fichier, nombre de sessions HAproxy, etc.) et envoyer des messages sur l'`event bus`  
+`reactors` : action déclenchée en réaction à un évenement sur l'`event bus`  
+`mine` : fonction du master qui collecte des données générées par des minions pour les rendre disponibles auprès des autres minions. Ces données sont supposées très dynamiques, avec un rafraichissement configurable
+
+**Remarque**
+
+Curieusement dans la documentation et la configuration, SaltStack parle de `states` et `grains` (pluriel) mais de `pillar` (singulier)
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Fonctionnement de base
+
+#### Mode client/server construit autour d'un `event bus`
 
 ![140%](./img/infra.png)
 
@@ -412,19 +444,40 @@ Rejected Keys:
 
 # On vérifie s'il répond bien
 
+Via la fonction d'**exécution distante**.
+
+Ici avec le module `test` et la fonction `ping` :
+
 ```bash
 [root@salt-master ~]# salt 'salt-minion' test.ping
 salt-minion:
     True
 ```
 
-Ceci n'est pas un ping ICMP !
+Attention, ceci n'est pas un ping ICMP !
 
-Voici ce qui est en réalité exécuté sur le minion (code simplifié de /usr/lib/python2.7/site-packages/salt/modules/test.py):
+Le minion exécute une fonction Python:
 
 ```python
 def ping():
     return True
+```
+
+Code simplifié issu de `/usr/lib/python2.7/site-packages/salt/modules/test.py` sur le minion.
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Un autre exemple d'exécution distante
+
+salt 'cible' module.fonction [arguments] [options salt]
+
+```bash
+# salt 'salt-minion' selinux.setenforce Enforcing --output=json
+{
+    "salt-minion": "Enforcing"
+}
 ```
 
 
@@ -438,7 +491,7 @@ Le code qu'on va développer est au service de l'infrastructure (un bug dans le 
 
 Les bonnes pratiques de développement s'appliquent ! Définir des guidelines de développement (syntaxe, structure des fichiers, etc.)
 
-Système de contrôle de versions (SVN, Git, Mercurial) avec un workflow de développement
+Système de contrôle de versions (SVN, Git, etc.) avec un workflow de développement
 
 Ne rien pousser en production qui n'a pas été testé et validé (principe des 4 yeux)
 
@@ -459,16 +512,16 @@ Et surtout :
 /srv
 /srv/salt
 /srv/salt/pillars
-/srv/salt/pillars/top.sls
+/srv/salt/pillars/top.sls <------------- top.sls pour les pillars
 /srv/salt/pillars/passwords
-/srv/salt/pillars/passwords/init.sls
+/srv/salt/pillars/passwords/init.sls <-- un pillar
 /srv/salt/states
 /srv/salt/states/motd
-/srv/salt/states/motd/init.sls
+/srv/salt/states/motd/init.sls <-------- un state
 /srv/salt/states/motd/motd.jinja
 /srv/salt/states/selinux
-/srv/salt/states/selinux/init.sls
-/srv/salt/states/top.sls
+/srv/salt/states/selinux/init.sls <----- un autre state
+/srv/salt/states/top.sls <-------------- top.sls pour les states
 ```
 
 ---
@@ -504,7 +557,7 @@ Ne jamais cibler un serveur sur base de son nom ! Le top.sls doit être le plus 
 
 MOTD : "message of the day", message affiché à la connexion au serveur
 
-Notre manifest d'installation :
+Notre état de configuration (fichier .sls, SaLt State) est écrit en YAML :
 
 ```yaml
 [root@salt-master ~]# cat /srv/salt/states/motd/init.sls
@@ -517,7 +570,7 @@ ma_conf_motd:                    <-- ID unique
 
 `salt://` est un serveur HTTP embarqué dans Salt, on peut spécifier d'autres types de sources : `http://`, `https://`, `ftp://`, `file:///`, etc.
 
-Par défaut jinja, plusieurs moteurs de template supportés. KISS !
+Par défaut jinja, plusieurs moteurs de templates supportés. But KISS !
 
 ---
 
@@ -608,6 +661,11 @@ Vérifions sur notre minion :
 Bonjour et bienvenue sur salt-minion
 Mon master est 10.211.55.26
 ```
+---
+
+![bg 70%](./img/bg.png)
+
+# Les states se reposent sur l'exécution distante !
 
 ---
 
@@ -826,6 +884,96 @@ Rappel :
 `{{ salt['pillar.get']('PWD', None) }}`
 
 Privilégier la méthode `salt['module.function']` plus avancée et permettant de définir des valeurs par défaut si la variable recherchée n'existe pas.
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Que se passe-t'il sur le bus ?
+
+`salt-run state.event pretty=True`
+
+```
+salt/job/20161211013317058053/ret/salt-minion	{
+    "_stamp": "2016-12-11T00:33:17.060487",
+    "arg": [
+        "bonjour"
+    ],
+    "cmd": "_return",
+    "fun": "event.send",
+    "fun_args": [
+        "bonjour"
+    ],
+    "id": "salt-minion",
+    "jid": "20161211013317058053",
+    "retcode": 0,
+    "return": true,
+    "tgt": "salt-minion",
+    "tgt_type": "glob"
+}
+```
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Les runners
+
+`state.highstate` s'exécute de manière concurrentielle sur les minions.
+
+Le runner `state.orchestrate` s'exécute sur le master et permet d'appliquer les états de manière orchestrée dans un ordre défini et coordonné, par exemple : 
+
+- installer la base de données
+- installer le serveur applicatif backend
+- reconfigurer le HAproxy frontend
+
+---
+
+# Les reactors
+
+```yaml
+reactor:
+  - 'salt/job/*/ret/salt-minion':
+    - /srv/salt/reactors/jenkins.sls
+```
+
+A chaque retour d'un minion, déclencher le `state` jenkins.
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Interfaçage REST
+
+#### Salt peut consommer des services REST
+
+`salt-run http.query https://jenkins.example.org/ params='{"job": "true"}'`
+
+On peut donc imaginer une fonctionnalité webhook avec un reactor.
+
+Par exemple :
+- ouverture automatique d'un ticket lors d'un événement sur le bus
+- déclencher un job Jenkins
+
+#### Salt fourni un service REST
+
+Exemple : 
+- déclencher une action Salt après exécution d'un job Jenkins (déployer l'artefact)
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Salt Cloud
+
+Permet de générer des machines virtuelles à partir de profils, sur différentes plateformes "cloud" telles que :
+- VMware 
+- Proxmox
+- Openshift
+- Amazon
+- Google
+- Parallels
+- etc.
 
 ---
 
