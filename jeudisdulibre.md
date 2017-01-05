@@ -827,16 +827,16 @@ Pour des raisons de performances, chaque `state` est mis en cache sur le minion 
 Imaginons un state `mysql-users` :
 
 ```
-frank:
+bob:
   mysql_user.present:
     - host: localhost
-    - password: bobcat
+    - password: eponge
 ```
 Ce fichier sera mis en cache sur les minions sous `/var/cache/salt/minions/files/base/mysql-users/init.sls`
 
-#### Problème de sécurité
+#### ==> Problème de sécurité
 
-Les pillars ne sont jamais conservés en cache !
+Par contre, les pillars ne sont jamais conservés en cache !
 
 ---
 
@@ -849,15 +849,15 @@ Alternative avec utilisation d'un pillar :
 /srv/salt/pillars/mysql/init.sls
 ```
 mysql:
- frank:
-   password: bobcat
+ bob:
+   password: eponge
 ```
 /srv/salt/states/mysql/init.sls
 ```
-frank:
+bob:
   mysql_user.present:
     - host: localhost
-    - password: {{ salt['pillar.get']('mysq:frank:password'), 'defaut' }}
+    - password: {{ salt['pillar.get']('mysq:bob:password'), 'defaut' }}
 ```
 
 Rappel :
@@ -937,7 +937,7 @@ reactor:
     - /srv/salt/reactors/jenkins.sls
 ```
 
-A chaque retour d'un minion, déclencher le `state` jenkins.
+A chaque retour d'un minion, déclencher le reactor jenkins.
 
 ---
 
