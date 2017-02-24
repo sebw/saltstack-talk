@@ -9,13 +9,16 @@
 ![](./img/logo.png)
 
 
-## La gestion de configuration et de cloud
+# La gestion de configuration et de cloud
 
 _Les Jeudis du Libre, Mons_
 _20/04/2017_
 
-Sébastien Wains
-sebastien.wains@gmail.com
+**Sébastien Wains**
+
+![](./img/gmail-logo.png) sebastien.wains@gmail.com
+![](./img/github-logo.png) @sebw 
+![](./img/telegram-logo.ico) @SebastienWains
 
 ---
 
@@ -25,9 +28,24 @@ sebastien.wains@gmail.com
 
 # Qui suis-je ?
 
-#### Administrateur systèmes Linux chez ETNIC, pôle de compétence IT de la Fédération Wallonie-Bruxelles
+## Aujourd'hui 
 
-#### Avant : Province de Hainaut, indépendant, Novacom (devenu BeIP), Multitel ASBL
+Administrateur systèmes Linux chez ETNIC, pôle de compétence IT de la Fédération Wallonie-Bruxelles
+
+## Avant
+
+Province de Hainaut
+Indépendant
+Novacom (devenu BeIP)
+Multitel ASBL
+
+---
+
+![bg 70%](./img/bg.png)
+
+<!-- page_number: true -->
+
+# Qui suis-je ?
 
 #### Blogger presqu'à la retraite ([https://blog.wains.be](https://blog.wains.be))
 
