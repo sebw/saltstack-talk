@@ -9,10 +9,10 @@
 ![](./img/logo.png)
 
 
-## Une nouvelle approche à la gestion d'infrastructure
+## La gestion de configuration et de cloud
 
 _Les Jeudis du Libre, Mons_
-_20/04/2017_ **TODO**
+_20/04/2017_
 
 Sébastien Wains
 sebastien.wains@gmail.com
@@ -25,15 +25,15 @@ sebastien.wains@gmail.com
 
 # Qui suis-je ?
 
-#### Depuis 2010 : administrateur systèmes Linux chez ETNIC, pôle de compétence IT de la Fédération Wallonie-Bruxelles
+#### Administrateur systèmes Linux chez ETNIC, pôle de compétence IT de la Fédération Wallonie-Bruxelles
 
-#### Avant : Province de Hainaut, indépendant, Multitel ASBL
+#### Avant : Province de Hainaut, indépendant, Novacom (devenu BeIP), Multitel ASBL
 
 #### Blogger presqu'à la retraite ([https://blog.wains.be](https://blog.wains.be))
 
-#### Gradué de l'Institut Supérieur Economique (ISE) de Flénu en section... comptabilité
+#### Gradué de l'Institut Supérieur Economique (ISE) de Mons en... comptabilité
 
-#### Red Hat Certified Engineer sous RHEL4
+#### Red Hat Certified Engineer
 
 #### Contributeur à différents projets Open Source, principalement Salt et Rundeck aujourd'hui
 
@@ -43,7 +43,7 @@ sebastien.wains@gmail.com
 
 # Que permet Salt ?
 
-- exécution distance (sa fonction première en 2011)
+- exécution à distance (sa fonction première au début du projet)
 - gestion de configuration
 - récupération d'informations
 - orchestration
@@ -118,15 +118,15 @@ Utilisateurs :
 #### Les problèmes constatés dès les premières semaines
 
 - Authentification `root` par mot de passe...
-- ...connu de presque tout le monde (devs, ops, consultants !)
+- ...connu de presque tout le monde (devs, ops, consultants :-()
 - Des distributions différentes (SuSE Enterprise, OpenSuse, Debian, RedHat, RedHat Enterprise)
-- Pas d'utilisation de packages, ou alors trouvés sur rpmfind et autres
+- Compilation au lieu d'utilisation de packages
 - Aucune gestion des mises à jour
 - Des services SSH, NTP, SMTP, DNS mal ou pas configurés
 - Des inconsistences entre environnements d'un même projet ou nodes d'un même cluster
 - Pas d'authentification centralisée
 - Services sécurisés par SSL self-signed ou pas du tout
-- Installation OS entièrement à la main depuis l'ISO qui traine sur un PC
+- Installation OS entièrement à la main depuis un ISO
 - Monitoring quasi absent
 - Un équivalent temps plein pour remettre de l'ordre dans tout ça...
 
@@ -173,10 +173,11 @@ Utilisateurs :
 
 # Un peu d'histoire
 
-#### Pour faire pour un mieux et dans l'immédiat je pars sur ces standards
+#### Pour faire pour un mieux et dans l'immédiat je commence sur ces standards
 
 - Installation d'un serveur : template VMware RHEL5 installation minimale
-- Installation des services de bases et configurations : script bash
+- Installation des services de base et leurs configurations : script bash
+
 
 ---
 
@@ -203,8 +204,8 @@ Et je ne gère alors que le strict minimum !
 
 
 - à l'époque Puppet est toujours en mode "pull" (le client demande au serveur si il y a un changement qui le concerne)
-- la recommandation du formateur pour une infrastructure telle que la notre était un pull toutes les 30 minutes et au moins deux masters (charge). Risques de delta jusqu'à 29 minutes entre serveurs d'un même cluster.
-- la gestion de configuration, le remote execution et facter sont trois composants séparés installés individuellements (Puppet, MCollective, Facter)
+- la recommandation du formateur pour une infrastructure telle que la notre était un pull toutes les 30 minutes et au moins deux masters. J'y vois un risque de delta jusqu'à 29 minutes entre serveurs d'un même cluster.
+- la gestion de configuration, l'exécution à distance et et la récupération d'informations depuis les nodes se font via trois composants installés séparément (Puppet, MCollective, Facter)
 - la syntaxe n'est pas très claire (Ruby DSL)
 
 #### Conclusion : pas vraiment convaincu
@@ -220,11 +221,11 @@ Et je ne gère alors que le strict minimum !
 - deux principaux types de noeuds : 
   - un serveur `salt-master` 
   - des clients `salt-minion`
-- gestion de configuration de services de base  pour commencer (SSH, SMTP, NTP)
+- gestion de configuration de services de base pour commencer, afin de remplacer le script (SSH, SMTP, NTP)
 - remote execution (`yum upgrade x`, `uptime`)
 - récupération d'informations sur le parc (CPU, mémoire, version OS)
 - code dans SVN
-- test du code via `test=True`
+- test du code via `test=True` avant de pousser en production
 
 ---
 
@@ -238,10 +239,11 @@ Et je ne gère alors que le strict minimum !
 - YAML et Jinja (mais attention à la syntaxe !)
 - Modèle client/serveur (`salt-minion`/`salt-master`)
 - `salt-syndic` pour les grosses infrastructures ("proxy")
-- Mode masterless possible (données sur le minion)
+- Mode masterless possible (code sur le minion)
 - Mode push ET pull
 - Début d'un support de Windows
-- Gestion de configuration, remote execution, facts dans un seul package
+- Salt Cloud pour instancier le node avant de gérer sa configuration
+- Gestion de configuration, exécution à distance, récupération d'informations dans un seul package
 - Simple ! De l'installation à un premier fichier de configuration géré : 12 minutes
 - Communauté enthousiaste et dynamique
 
@@ -260,7 +262,7 @@ Et je ne gère alors que le strict minimum !
   - pas de support VMware dans Salt-Cloud
   - pull requests acceptés 5 minutes montre en main
   - régressions occasionnelles
-  - faille de sécurité (dont une critique dans la PKI)
+  - failles de sécurité (dont une critique dans la PKI)
 - Release cycle "Chuck Norris"
 - Quelques gros bugs :
   - `reload: True` qui fait un restart du service au lieu d'un reload
@@ -277,7 +279,7 @@ Et je ne gère alors que le strict minimum !
 - SaltStack fourni des dépôts avec toutes les dépendances [0]
 - Le support de Windows et MacOS a bien avancé
 - Impératif ET déclaratif
-- Ils ont engagé une équipe de testeurs : moins de releases, quasi plus de régressions
+- Ils ont engagé une équipe de testeurs : releases moins fréquentes, mieux testées, quasi plus de régressions
 - Salt SSH pour gérer les "dumb" devices qui embarquent Python 2.6 ou plus
 - Salt Proxy pour gérer les "super dumb" devices n'embarquant pas de stack Python
 - Salt API fonctionne ! Intégrations possibles avec Jenkins, Rundeck, Satellite, etc.
@@ -487,9 +489,9 @@ salt 'cible' module.fonction [arguments] [options salt]
 
 # Rappel avant d'écrire nos premières lignes de code
 
-Le code qu'on va développer est au service de l'infrastructure (un bug dans le code = un downtime éventuel)
+Infracture as code (un bug dans le code = un downtime éventuel)
 
-Les bonnes pratiques de développement s'appliquent ! Définir des guidelines de développement (syntaxe, structure des fichiers, etc.)
+Nous sommes à présent des développeurs ! Définir des guidelines de développement (syntaxe, structure des fichiers, etc.)
 
 Système de contrôle de versions (SVN, Git, etc.) avec un workflow de développement
 
@@ -543,7 +545,7 @@ base:
     - solr
 ```
 
-Appliquer le state `motd` sur tous les `minions`, 
+Appliquer le state `motd` sur tous les `minions`.
 
 Pour les OS de type `RedHat`, appliquer le state `selinux`.
 
@@ -730,7 +732,7 @@ Les modules se chargent de "deviner" les utilitaires à utiliser.
 
 Noms de packages différents entre distributions (`apache2` vs `httpd`) ?
 
-Map files ! (ressemble fortement à un template jinja)
+Définir des "map files" ! (ressemble fortement à un template jinja)
 
 ---
 
@@ -788,7 +790,7 @@ role-{{ i }}-conf:
 
 # Définir un grain automatiquement
 
-Il est possible de récupérer des informations provenant de différentes sources (CMDB, LDAP, DB, API) et de les stocker dans des grains de nos minions.
+Il est possible de récupérer des informations provenant de différentes sources (CMDB, LDAP, DB, API) et de les stocker dans en grains sur nos minions.
 
 Mise à jour au runtime ou `saltutil.sync_grains`
 
@@ -826,7 +828,7 @@ Pour des raisons de performances, chaque `state` est mis en cache sur le minion 
 
 Imaginons un state `mysql-users` :
 
-```
+```jinja
 bob:
   mysql_user.present:
     - host: localhost
@@ -865,7 +867,7 @@ Rappel :
 - Les pillars sont conçus pour stocker des informations sensibles 
 - Ils ne sont jamais stockés sur les minions
 - Limiter leur utilisation aux données sensibles
-- Problème de performances potentiel si trop de pillars (pas dans la doc !)
+- Problème de performances potentiel si beaucoup trop de pillars (pas dans la doc !)
 
 ---
 
@@ -875,12 +877,12 @@ Rappel :
 
 #### Grains
 
-`{{ grains['ROLE'}}`
+`{{ grains['ROLE'] }}`
 `{{ salt['grains.get']('ROLE', None) }}`
 
 #### Pillars
 
-`{{ pillar['PWD'}}`
+`{{ pillar['PWD'] }}`
 `{{ salt['pillar.get']('PWD', None) }}`
 
 Privilégier la méthode `salt['module.function']` plus avancée et permettant de définir des valeurs par défaut si la variable recherchée n'existe pas.
@@ -958,7 +960,7 @@ Par exemple :
 #### Salt fourni un service REST
 
 Exemple : 
-- déclencher une action Salt après exécution d'un job Jenkins (déployer l'artefact)
+- déclencher une action Salt après exécution d'un job Jenkins (déployer un nouvel artefact)
 
 ---
 
@@ -966,7 +968,7 @@ Exemple :
 
 # Salt Cloud
 
-Permet de générer des machines virtuelles à partir de profils, sur différentes plateformes "cloud" telles que :
+Permet de créer des machines virtuelles à partir de profils, sur différentes plateformes "cloud" telles que :
 - VMware 
 - Proxmox
 - Openshift
@@ -981,13 +983,21 @@ Permet de générer des machines virtuelles à partir de profils, sur différent
 
 # Démonstration !
 
-#### La production des Jeudis du Libre tient à rassurer le spectateur qu'aucun minion ne sera blessé durant cette présentation.
+#### La production des Jeudis du Libre tient à rassurer le spectateur qu'aucun minion ne sera maltraité durant cette présentation.
 
 ---
 
 ![bg 70%](./img/bg.png)
 
-# Questions / réponses
+# L'ETNIC est toujours à la recherche de nouveaux talents !
+
+# https://monjob.etnic.be
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Questions et (tentatives de) réponses
 
 ---
 
