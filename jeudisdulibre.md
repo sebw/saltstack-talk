@@ -28,32 +28,15 @@ _20/04/2017_
 
 # Qui suis-je ?
 
-## Aujourd'hui 
+Administrateur systèmes Linux chez ETNIC
 
-Administrateur systèmes Linux chez ETNIC, pôle de compétence IT de la Fédération Wallonie-Bruxelles
+Gradué de l'Institut Supérieur Economique (ISE) de Mons en... comptabilité
 
-## Avant
+Blogger ([https://blog.wains.be](https://blog.wains.be))
 
-Province de Hainaut
-Indépendant
-Novacom (devenu BeIP)
-Multitel ASBL
+Red Hat Certified Engineer
 
----
-
-![bg 70%](./img/bg.png)
-
-<!-- page_number: true -->
-
-# Qui suis-je ?
-
-#### Blogger presqu'à la retraite ([https://blog.wains.be](https://blog.wains.be))
-
-#### Gradué de l'Institut Supérieur Economique (ISE) de Mons en... comptabilité
-
-#### Red Hat Certified Engineer
-
-#### Contributeur à différents projets Open Source, principalement Salt et Rundeck aujourd'hui
+Contribution à des projets Open Source
 
 ---
 
@@ -84,6 +67,18 @@ Multitel ASBL
 - visibilité
 - compliance
 - ...
+
+---
+
+![bg 70%](./img/bg.png)
+
+<h1><p style="text-align: center;">Combien de serveurs pour commencer ?</p>
+
+---
+
+![bg 70%](./img/bg.png)
+
+<p style="text-align: center;"><img src="./img/1.ico"></p>
 
 ---
 
@@ -140,6 +135,15 @@ Utilisateurs :
 - Des distributions différentes (SuSE Enterprise, OpenSuse, Debian, RedHat, RedHat Enterprise)
 - Compilation au lieu d'utilisation de packages
 - Aucune gestion des mises à jour
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Un peu d'histoire
+
+#### Les problèmes constatés dès les premières semaines
+
 - Des services SSH, NTP, SMTP, DNS mal ou pas configurés
 - Des inconsistences entre environnements d'un même projet ou nodes d'un même cluster
 - Pas d'authentification centralisée
@@ -158,7 +162,7 @@ Utilisateurs :
 
 #### Les challenges techniques
 
-- La situation est critique partout
+- La situation est problématique partout
 - Il faut définir : 
   - des standards
   - des politiques de sécurité, de mises à jours
@@ -173,17 +177,17 @@ Utilisateurs :
 
 ---
 
-# Il faut faire face à la résistance au changement
+<center><h1> Il faut faire face à la résistance au changement</h1>
 
-## Des accès root en prod ?
+<center><h2>Des accès root en production ?<h2>
 
 ![150%](./img/root.jpg)
 
 ---
 
-## L'accueil n'a pas toujours été chaleureux
+<center><h1>L'accueil a parfois été mitigé</h1>
 
-![150%](./img/devs-without-root.jpg)
+![150%](./img/devs-without-root.jpg)</center>
 
 ---
 
@@ -220,9 +224,8 @@ Et je ne gère alors que le strict minimum !
 
 #### Fin 2011 je participe à une formation Puppet
 
-
-- à l'époque Puppet est toujours en mode "pull" (le client demande au serveur si il y a un changement qui le concerne)
-- la recommandation du formateur pour une infrastructure telle que la notre était un pull toutes les 30 minutes et au moins deux masters. J'y vois un risque de delta jusqu'à 29 minutes entre serveurs d'un même cluster.
+- à l'époque Puppet est toujours en mode "pull"
+- la recommandation du formateur pour notre infrastructure était deux masters à raison d'un pull toutes les 30 minutes ==> risque de delta
 - la gestion de configuration, l'exécution à distance et et la récupération d'informations depuis les nodes se font via trois composants installés séparément (Puppet, MCollective, Facter)
 - la syntaxe n'est pas très claire (Ruby DSL)
 
@@ -258,6 +261,13 @@ Et je ne gère alors que le strict minimum !
 - Modèle client/serveur (`salt-minion`/`salt-master`)
 - `salt-syndic` pour les grosses infrastructures ("proxy")
 - Mode masterless possible (code sur le minion)
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Les avantages (en 2013)
+
 - Mode push ET pull
 - Début d'un support de Windows
 - Salt Cloud pour instancier le node avant de gérer sa configuration
@@ -279,12 +289,20 @@ Et je ne gère alors que le strict minimum !
   - installation de Salt-API impossible 
   - pas de support VMware dans Salt-Cloud
   - pull requests acceptés 5 minutes montre en main
-  - régressions occasionnelles
   - failles de sécurité (dont une critique dans la PKI)
-- Release cycle "Chuck Norris"
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Les inconvénients (en 2013)
+
+- Release cycle trop rapide et sans test
+
+![40%](./img/regression.png)
+
 - Quelques gros bugs :
-  - `reload: True` qui fait un restart du service au lieu d'un reload
-    -  plus d'internet pour 5000 utilisateurs pendant le restart de 4 nodes Squid
+  - `reload: True` qui fait un restart
   - ZeroMQ sous RHEL5 qui provoque la perte régulière des minions
 
 ---
@@ -297,7 +315,7 @@ Et je ne gère alors que le strict minimum !
 - SaltStack fourni des dépôts avec toutes les dépendances [0]
 - Le support de Windows et MacOS a bien avancé
 - Impératif ET déclaratif
-- Ils ont engagé une équipe de testeurs : releases moins fréquentes, mieux testées, quasi plus de régressions
+- Ils ont engagé une équipe de testeurs : releases moins fréquentes, mieux testées, plus de régressions depuis longtemps
 - Salt SSH pour gérer les "dumb" devices qui embarquent Python 2.6 ou plus
 - Salt Proxy pour gérer les "super dumb" devices n'embarquant pas de stack Python
 - Salt API fonctionne ! Intégrations possibles avec Jenkins, Rundeck, Satellite, etc.
@@ -314,13 +332,12 @@ Et je ne gère alors que le strict minimum !
 - L'équipe Linux a triplé il y a un an et Salt a été adopté immédiatement par les deux nouveaux membres
 - Un consultant de SaltStack est venu auditer notre infrastructure
 - Salt Community 2016.11 (dernière release stable)
-- 260 serveurs Red Hat gérés (virtualisation 98%) :thumbsup:
-- Deux salt-master (un `develop` pour les serveurs DEV/ACC, un `master` pour les serveurs PRD)
-- Trois salt-master et trois salt-minion pour le développement des `states`
+- 260 serveurs Red Hat gérés (virtualisation 99%) :thumbsup:
+- Cinq salt-master (3x lab, 1x non prod, 1x prod)
 - Encore quelques serveurs legacy non gérables :bomb:
 - Un nouveau serveur virtuel RHEL7 complètement provisionné et intégré en moins de 10 minutes grâce à Salt Cloud et Rundeck [0]
 - Tout le code dans un dépôt Gitlab
-- Basé sur un vrai workflow de développement [1]
+- Workflow de développement [1]
 
 [0] [http://www.rundeck.org](http://www.rundeck.org)
 [1] [https://www.atlassian.com/git/tutorials/comparing-workflows/](https://www.atlassian.com/git/tutorials/comparing-workflows/)
@@ -333,7 +350,7 @@ Et je ne gère alors que le strict minimum !
 
 ---
 
-![150%](./img/under-control.jpg)
+<center><img src="./img/under-control.jpg"></center>
 
 ---
 
@@ -376,7 +393,13 @@ Curieusement dans la documentation et la configuration, SaltStack parle de `stat
 
 #### Mode client/server construit autour d'un `event bus`
 
-![140%](./img/infra.png)
+<center><img src="./img/infra.png" height="500"></center>
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Fonctionnement de base
 
 - Les minions restent connectés constamment au master (message bus ZeroMQ)
 - Le master doit accepter la clé d'un nouveau minion (PKI)
@@ -1007,9 +1030,11 @@ Permet de créer des machines virtuelles à partir de profils, sur différentes 
 
 ![bg 70%](./img/bg.png)
 
-# L'ETNIC est toujours à la recherche de nouveaux talents !
+<center><img src="./img/etnic.png"></center>
 
-# https://monjob.etnic.be
+<center><h1>L'ETNIC est régulièrement à la recherche de nouveaux talents !</h1></center>
+
+<center><h1>https://monjob.etnic.be</center>
 
 ---
 
@@ -1021,5 +1046,6 @@ Permet de créer des machines virtuelles à partir de profils, sur différentes 
 
 ![bg 70%](./img/bg.png)
 
-# Merci et à tout de suite ! 
-# :beer::beer::beer:
+<center><img src="./img/qrcode.jpg" height="600"></center>
+
+# Merci et à tout de suite ! :beer::beer::beer:
