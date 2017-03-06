@@ -47,9 +47,10 @@ Contribution à des projets Open Source
 - exécution à distance (sa fonction première au début du projet)
 - gestion de configuration
 - récupération d'informations
-- orchestration
+- cloud provisioning
+- orchestration (ex : création VM > install rôle > import DB > install app)
 - monitoring
-- provisioning
+
 - auto-scaling
 - compliance
 
@@ -57,7 +58,7 @@ Contribution à des projets Open Source
 
 ![bg 70%](./img/bg.png)
 
-# Les avantages de la gestion de configuration
+# Les avantages de la gestion de configuration :chart_with_upwards_trend: 
 
 - efficacité
 - stabilité
@@ -78,7 +79,11 @@ Contribution à des projets Open Source
 
 ![bg 70%](./img/bg.png)
 
-<p style="text-align: center;"><img src="./img/1.ico"></p>
+<center><img src="./img/1.ico"></center>
+
+<center>Avec Salt</center>
+
+:wink:
 
 ---
 
@@ -110,10 +115,10 @@ Contribution à des projets Open Source
 
 # Un peu d'histoire
 
-#### En 2010, l'ETNIC avait environ 150 serveurs Linux (70% virtuels)
+#### En 2010, l'ETNIC avait environ 150 serveurs Linux (~ 80% virtuels)
 
 - Des ressources techniques : DNS, relais SMTP, webmail, forward et reverse proxy, serveurs web, database, etc.
-- Des projets et applications métiers : ESB, data warehouse, gestion électronique documentaire, SAP, formulaires intelligents, CMS, etc.
+- Des projets et applications métiers : ESB, data warehouse, gestion électronique documentaire, ERP, formulaires intelligents, CMS, etc.
 
 Utilisateurs : 
 
@@ -128,10 +133,11 @@ Utilisateurs :
 
 # Un peu d'histoire
 
-#### Les problèmes constatés dès les premières semaines
+#### Les problèmes constatés dès les premières semaines (1/2)
 
 - Authentification `root` par mot de passe...
-- ...connu de presque tout le monde (devs, ops, consultants :-()
+- ...unique...
+- ...connu de presque tout le monde (devs, ops, consultants :sob:)
 - Des distributions différentes (SuSE Enterprise, OpenSuse, Debian, RedHat, RedHat Enterprise)
 - Compilation au lieu d'utilisation de packages
 - Aucune gestion des mises à jour
@@ -142,14 +148,15 @@ Utilisateurs :
 
 # Un peu d'histoire
 
-#### Les problèmes constatés dès les premières semaines
+#### Les problèmes constatés dès les premières semaines (2/2)
 
 - Des services SSH, NTP, SMTP, DNS mal ou pas configurés
 - Des inconsistences entre environnements d'un même projet ou nodes d'un même cluster
 - Pas d'authentification centralisée
 - Services sécurisés par SSL self-signed ou pas du tout
 - Installation OS entièrement à la main depuis un ISO
-- Monitoring quasi absent
+- Tout n'est pas monitoré
+- Pas de documentation
 - Un équivalent temps plein pour remettre de l'ordre dans tout ça...
 
 ---
@@ -169,15 +176,19 @@ Utilisateurs :
   - des nouvelles méthodes de travail
 - Il faut :
   - améliorer le processus de création de nouveaux serveurs
-  - et de leur configurations
+  - ... et de leur configurations
 - Et migrer, migrer, migrer le legacy !
 - En plus de travailler sur les nouveaux projets
 
-#### Les challenges ne sont pas que techniques
+---
+
+![bg 70%](./img/bg.png)
+
+<center><h1>Les challenges ne sont pas que techniques !</h1></center>
 
 ---
 
-<center><h1> Il faut faire face à la résistance au changement</h1>
+<center><h1>Il faut faire face à la résistance au changement</h1>
 
 <center><h2>Des accès root en production ?<h2>
 
@@ -284,12 +295,12 @@ Et je ne gère alors que le strict minimum !
 - Installation d'un agent (salt-minion) qui doit être dans la même version que le salt-master (pas d'aligment Debian/RedHat)
 - Agent et ses dépendances (Python, ZeroMQ, msgpack) éparpillés dans les dépôts (Redhat, EPEL)
 - Language déclaratif (ordre d'exécution aléatoire si pas de dépendances entre actions)
-- Donne l'impression de partir un peu dans tous les sens : 
+- Communauté **trop** enthousiaste...
+- ... qui donne l'impression de partir un peu dans tous les sens : 
   - tout est en chantier, rien n'est abouti
   - installation de Salt-API impossible 
   - pas de support VMware dans Salt-Cloud
   - pull requests acceptés 5 minutes montre en main
-  - failles de sécurité (dont une critique dans la PKI)
 
 ---
 
@@ -301,9 +312,10 @@ Et je ne gère alors que le strict minimum !
 
 ![40%](./img/regression.png)
 
-- Quelques gros bugs :
+- Quelques gros bugs et failles de sécurité :
   - `reload: True` qui fait un restart
   - ZeroMQ sous RHEL5 qui provoque la perte régulière des minions
+  - faille critique dans la PKI
 
 ---
 
@@ -311,15 +323,16 @@ Et je ne gère alors que le strict minimum !
 
 # Salt aujourd'hui
 
-- Pas de support Python 3
 - SaltStack fourni des dépôts avec toutes les dépendances [0]
+- Ils ont engagé une équipe de testeurs (@ch3ll) : releases moins fréquentes, mieux testées, plus de régressions depuis longtemps
 - Le support de Windows et MacOS a bien avancé
 - Impératif ET déclaratif
-- Ils ont engagé une équipe de testeurs : releases moins fréquentes, mieux testées, plus de régressions depuis longtemps
+
 - Salt SSH pour gérer les "dumb" devices qui embarquent Python 2.6 ou plus
 - Salt Proxy pour gérer les "super dumb" devices n'embarquant pas de stack Python
 - Salt API fonctionne ! Intégrations possibles avec Jenkins, Rundeck, Satellite, etc.
 - Un web GUI dans la version enterprise
+- Pas de support Python 3
 
 [0] [https://repo.saltstack.com](https://repo.saltstack.com)
 
@@ -408,6 +421,7 @@ Curieusement dans la documentation et la configuration, SaltStack parle de `stat
   - TCP/4506 : pour les messages de retour des minions
 - Le salt-master peut tourner en utilisateur non privilégié
 - Le salt-minion doit tourner en root
+- Fonctionne avec SELinux en mode `Enforcing`
 
 ---
 
@@ -617,7 +631,7 @@ ma_conf_motd:                    <-- ID unique
     - template: jinja            <-- type de template
 ```
 
-`salt://` est un serveur HTTP embarqué dans Salt, on peut spécifier d'autres types de sources : `http://`, `https://`, `ftp://`, `file:///`, etc.
+`salt://` est un serveur HTTP embarqué dans Salt, on peut spécifier d'autres types de sources : `http://`, `https://`, `ftp://`, `file://`, etc.
 
 Par défaut jinja, plusieurs moteurs de templates supportés. But KISS !
 
@@ -710,11 +724,6 @@ Vérifions sur notre minion :
 Bonjour et bienvenue sur salt-minion
 Mon master est 10.211.55.26
 ```
----
-
-![bg 70%](./img/bg.png)
-
-# Les states se reposent sur l'exécution distante !
 
 ---
 
@@ -773,7 +782,7 @@ Déclaratif :
 Les modules se chargent de "deviner" les utilitaires à utiliser.
 
 `pkg.installed` utilisera le gestionnaire de package du système : `yum`, `apt`, `zypper`, etc.
-`service.running` démarra le service via ce qu'il trouve parmi `sysVinit`, `systemd`, `upstart`.
+`service.running` démarra le service via ce qu'il trouve parmi `sysVinit`, `systemd`, `upstart`, etc.
 
 # Oui mais...
 
@@ -837,7 +846,7 @@ role-{{ i }}-conf:
 
 # Définir un grain automatiquement
 
-Il est possible de récupérer des informations provenant de différentes sources (CMDB, LDAP, DB, API) et de les stocker dans en grains sur nos minions.
+Il est possible de récupérer des informations provenant de différentes sources (CMDB, LDAP, DB, API, etc.) et de les stocker dans en grains sur nos minions.
 
 Mise à jour au runtime ou `saltutil.sync_grains`
 
@@ -906,7 +915,7 @@ mysql:
 bob:
   mysql_user.present:
     - host: localhost
-    - password: {{ salt['pillar.get']('mysq:bob:password'), 'defaut' }}
+    - password: {{ salt['pillar.get']('mysql:bob:password'), 'defaut' }}
 ```
 
 Rappel :
