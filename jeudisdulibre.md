@@ -28,7 +28,7 @@ _20/04/2017_
 
 # Qui suis-je ?
 
-Administrateur systèmes Linux chez ETNIC
+Administrateur systèmes chez ETNIC
 
 Gradué de l'Institut Supérieur Economique (ISE) de Mons en... comptabilité
 
@@ -448,6 +448,8 @@ pillar_roots:
 
 Démarrage du service : `service salt-master start`
 
+Démarrage en mode debug : `salt-master -l debug`
+
 ---
 
 ![bg 70%](./img/bg.png)
@@ -461,6 +463,8 @@ master: salt-master
 ```
 
 Démarrage du service : `service salt-minion start`
+
+Démarrage en mode debug : `salt-minion -l debug`
 
 ---
 
@@ -589,6 +593,8 @@ base:
 Appliquer le state `motd` sur tous les `minions`.
 
 Pour les OS de type `RedHat`, appliquer le state `selinux`.
+
+Pour les machines avec le ROLE custom `solr`, appliquer le state `solr`.
 
 Ne jamais cibler un serveur sur base de son nom ! Le top.sls doit être le plus **générique** possible.
 
@@ -934,27 +940,63 @@ Privilégier la méthode `salt['module.function']` plus avancée et permettant d
 
 # Que se passe-t'il sur le bus ?
 
-`salt-run state.event pretty=True`
+`salt-run state.event pretty=True` montre les events sur le master :
 
 ```
-salt/job/20161211013317058053/ret/salt-minion	{
-    "_stamp": "2016-12-11T00:33:17.060487",
-    "arg": [
-        "bonjour"
-    ],
-    "cmd": "_return",
-    "fun": "event.send",
-    "fun_args": [
-        "bonjour"
-    ],
-    "id": "salt-minion",
-    "jid": "20161211013317058053",
-    "retcode": 0,
-    "return": true,
-    "tgt": "salt-minion",
-    "tgt_type": "glob"
+salt/auth	{
+    "_stamp": "2017-02-21T07:59:27.659924",
+    "act": "accept",
+    "id": "jdl-minion1",
+    "pub": "-----BEGIN PUBLIC KEY-----.........",
+    "result": true
+}
+minion_start	{
+    "_stamp": "2017-02-21T07:59:28.146292",
+    "cmd": "_minion_event",
+    "data": "Minion jdl-minion1 started at Tue Feb 21 09:21:32 2017",
+    "id": "jdl-minion1",
+    "pretag": null,
+    "tag": "minion_start"
+}
+salt/minion/jdl-minion1/start	{
+    "_stamp": "2017-02-21T07:59:28.153296",
+    "cmd": "_minion_event",
+    "data": "Minion jdl-minion1 started at Tue Feb 21 09:21:32 2017",
+    "id": "jdl-minion1",
+    "pretag": null,
+    "tag": "salt/minion/jdl-minion1/start"
 }
 ```
+---
+
+# Les reactors
+
+Réaction à un events sur le bus, configuré sur le master dans `/etc/salt/master` :
+
+```yaml
+reactor:
+  - 'salt/minion/*/start':
+    - /srv/salt/reactors/start.sls
+  - 'salt/cloud/*/destroyed':
+    - /srv/reactor/destroy/*.sls
+```
+
+/srv/salt/reactors/start.sls :
+
+```yaml
+hipchat:
+  local.hipchat.send_message:
+    - tgt: jdl-master
+    - kwarg:
+        room_id: Notifications-SRV
+        from_name: Master
+        message: "Démarrage de {{ data['id'] }} à {{ data['_stamp'] }}"
+        api_key: xxx
+        api_version: v2
+        notify: False
+```
+
+A chaque retour d'un minion, envoyer une notification Hipchat.
 
 ---
 
@@ -968,19 +1010,7 @@ Le runner `state.orchestrate` s'exécute sur le master et permet d'appliquer les
 
 - installer la base de données
 - installer le serveur applicatif backend
-- reconfigurer le HAproxy frontend
-
----
-
-# Les reactors
-
-```yaml
-reactor:
-  - 'salt/job/*/ret/salt-minion':
-    - /srv/salt/reactors/jenkins.sls
-```
-
-A chaque retour d'un minion, déclencher le reactor jenkins.
+- reconfigurer le reverse proxy frontend
 
 ---
 
