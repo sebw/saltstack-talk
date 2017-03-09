@@ -571,7 +571,7 @@ Et surtout :
 /srv
 /srv/salt
 /srv/salt/pillars
-/srv/salt/pillars/top.sls <------------- top.sls pour les pillars
+/srv/salt/pillars/top.sls <------------- assigne des pillars aux minions
 /srv/salt/pillars/passwords
 /srv/salt/pillars/passwords/init.sls <-- un pillar
 /srv/salt/states
@@ -580,7 +580,7 @@ Et surtout :
 /srv/salt/states/motd/motd.jinja
 /srv/salt/states/selinux
 /srv/salt/states/selinux/init.sls <----- un autre state
-/srv/salt/states/top.sls <-------------- top.sls pour les states
+/srv/salt/states/top.sls <-------------- assigne des states aux minions
 ```
 
 ---
@@ -616,7 +616,7 @@ Ne jamais cibler un serveur sur base de son nom ! Le top.sls doit être le plus 
 
 # Notre premier state : `motd`
 
-MOTD : "message of the day", message affiché à la connexion au serveur
+MOTD : "message of the day", message affiché après login en session sur un serveur
 
 Notre état de configuration (fichier .sls, SaLt State) est écrit en YAML :
 
@@ -780,7 +780,7 @@ Déclaratif :
 Les modules se chargent de "deviner" les utilitaires à utiliser.
 
 `pkg.installed` utilisera le gestionnaire de package du système : `yum`, `apt`, `zypper`, etc.
-`service.running` démarra le service via ce qu'il trouve parmi `sysVinit`, `systemd`, `upstart`, etc.
+`service.running` démarre le service via ce qu'il trouve parmi `sysVinit`, `systemd`, `upstart`, etc.
 
 # Oui mais...
 
@@ -842,11 +842,13 @@ role-{{ i }}-conf:
 ```
 ---
 
+![bg 70%](./img/bg.png)
+
 # Définir un grain automatiquement
 
-Il est possible de récupérer des informations provenant de différentes sources (CMDB, LDAP, DB, API, etc.) et de les stocker dans en grains sur nos minions.
+Il est possible de récupérer des informations provenant de différentes sources (CMDB, LDAP, DB, API, etc.) et de les stocker dans des grains sur nos minions.
 
-Mise à jour au runtime ou `saltutil.sync_grains`
+Mise à jour des grains au runtime ou via la commande `saltutil.sync_grains`
 
 Ce script Python sera placé sous `/srv/salt/states/_grains/satellite.py`
 
