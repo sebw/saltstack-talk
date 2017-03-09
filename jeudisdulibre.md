@@ -141,6 +141,7 @@ Utilisateurs :
 - Des distributions différentes (SuSE Enterprise, OpenSuse, Debian, RedHat, RedHat Enterprise)
 - Compilation au lieu d'utilisation de packages
 - Aucune gestion des mises à jour
+- Les backups sont des scripts exécutés par cron sur chaque serveur
 
 ---
 
@@ -150,10 +151,10 @@ Utilisateurs :
 
 #### Les problèmes constatés dès les premières semaines (2/2)
 
-- Des services SSH, NTP, SMTP, DNS mal ou pas configurés
+- Des services importants tels que SSH, NTP, SMTP, DNS mal ou pas configurés
 - Des inconsistences entre environnements d'un même projet ou nodes d'un même cluster
 - Pas d'authentification centralisée
-- Services sécurisés par SSL self-signed ou pas du tout
+- Quasi aucun service sécurisé par SSL
 - Installation OS entièrement à la main depuis un ISO
 - Tout n'est pas monitoré
 - Pas de documentation
@@ -172,11 +173,11 @@ Utilisateurs :
 - La situation est problématique partout
 - Il faut définir : 
   - des standards
-  - des politiques de sécurité, de mises à jours
+  - des politiques de sécurité, de mises à jours, de monitoring, de backup, etc.
   - des nouvelles méthodes de travail
-- Il faut :
-  - améliorer le processus de création de nouveaux serveurs
-  - ... et de leur configurations
+- Il faut améliorer :
+  - le processus de création de nouveaux serveurs
+  - **... la gestion de leur configuration !**
 - Et migrer, migrer, migrer le legacy !
 - En plus de travailler sur les nouveaux projets
 
@@ -236,7 +237,7 @@ Et je ne gère alors que le strict minimum !
 #### Fin 2011 je participe à une formation Puppet
 
 - à l'époque Puppet est toujours en mode "pull"
-- la recommandation du formateur pour notre infrastructure était deux masters à raison d'un pull toutes les 30 minutes ==> risque de delta
+- la recommandation du formateur pour notre infrastructure était deux masters à raison d'un pull toutes les 30 minutes (risques : delta, charge et effet domino, etc.)
 - la gestion de configuration, l'exécution à distance et et la récupération d'informations depuis les nodes se font via trois composants installés séparément (Puppet, MCollective, Facter)
 - la syntaxe n'est pas très claire (Ruby DSL)
 
@@ -292,7 +293,7 @@ Et je ne gère alors que le strict minimum !
 
 # Les inconvénients (en 2013)
 
-- Installation d'un agent (salt-minion) qui doit être dans la même version que le salt-master (pas d'aligment Debian/RedHat)
+- Installation d'un agent (salt-minion) qui doit être dans la même version que le salt-master (alignement Debian/RedHat difficile)
 - Agent et ses dépendances (Python, ZeroMQ, msgpack) éparpillés dans les dépôts (Redhat, EPEL)
 - Language déclaratif (ordre d'exécution aléatoire si pas de dépendances entre actions)
 - Communauté **trop** enthousiaste...
@@ -313,7 +314,7 @@ Et je ne gère alors que le strict minimum !
 ![40%](./img/regression.png)
 
 - Quelques gros bugs et failles de sécurité :
-  - `reload: True` qui fait un restart
+  - `reload: True` qui fait un restart sur Redhat Entreprise Linux (RHEL)
   - ZeroMQ sous RHEL5 qui provoque la perte régulière des minions
   - faille critique dans la PKI
 
@@ -324,7 +325,7 @@ Et je ne gère alors que le strict minimum !
 # Salt aujourd'hui
 
 - SaltStack fourni des dépôts avec toutes les dépendances [0]
-- Ils ont engagé une équipe de testeurs (@ch3ll) : releases moins fréquentes, mieux testées, plus de régressions depuis longtemps
+- Ils ont engagé une équipe de testeurs (notamment @ch3ll) : releases moins fréquentes, mieux testées, plus de régressions depuis longtemps
 - Le support de Windows et MacOS a bien avancé
 - Impératif ET déclaratif
 
@@ -342,15 +343,15 @@ Et je ne gère alors que le strict minimum !
 
 # Salt à l'ETNIC aujourd'hui
 
-- L'équipe Linux a triplé il y a un an et Salt a été adopté immédiatement par les deux nouveaux membres
-- Un consultant de SaltStack est venu auditer notre infrastructure
-- Salt Community 2016.11 (dernière release stable)
-- 260 serveurs Red Hat gérés (virtualisation 99%) :thumbsup:
-- Cinq salt-master (3x lab, 1x non prod, 1x prod)
+- L'équipe Linux a triplé il y a un an, par l'engagement de deux sysadmins Linux junior. Salt a été adopté immédiatement et avec enthousiasme :smiley:
+- Un consultant de SaltStack est venu auditer notre infrastructure en décembre 2016
+- Version actuelle Salt Community en release stable (2016.11)
+- Environ 260 serveurs Red Hat gérés (virtualisation 99%) :thumbsup:
+- Cinq salt-master (1x lab par sysadmin, 1x non prod, 1x prod)
 - Encore quelques serveurs legacy non gérables :bomb:
-- Un nouveau serveur virtuel RHEL7 complètement provisionné et intégré en moins de 10 minutes grâce à Salt Cloud et Rundeck [0]
+- Un nouveau serveur virtuel RHEL7 complètement provisionné et intégré en moins de 12 minutes grâce à Salt Cloud et Rundeck [0]
 - Tout le code dans un dépôt Gitlab
-- Workflow de développement [1]
+- Développement sur base d'un workflow collaboratif [1]
 
 [0] [http://www.rundeck.org](http://www.rundeck.org)
 [1] [https://www.atlassian.com/git/tutorials/comparing-workflows/](https://www.atlassian.com/git/tutorials/comparing-workflows/)
@@ -363,7 +364,7 @@ Et je ne gère alors que le strict minimum !
 
 ---
 
-<center><img src="./img/under-control.jpg"></center>
+<center><img src="./img/under-control.jpg" width="700"></center>
 
 ---
 
@@ -375,10 +376,10 @@ Et je ne gère alors que le strict minimum !
 
 `master` : serveur de gestion  
 `minion` : serveur géré  
-`modules` : module d'exécution ayant différentes fonctions (ex : file.managed)
+`modules` : module d'exécution distante ayant différentes fonctions (ex : file.managed)
 `states` : état de configuration (package installé, fichier configuré, service démarré, etc.)  
 `grains` : informations relativement statiques des minions  
-`pillar` : informations dynamiques stockées sur le master à disposition des minions pour lesquelles elles sont définies
+`pillar` : informations dynamiques stockées sur le master à disposition des minions  
 `top.sls` : les fichiers d'assignation de `states` et `pillars` aux minions  
 `init.sls` : manifest d'un `state`, `pillar` 
 
@@ -415,13 +416,13 @@ Curieusement dans la documentation et la configuration, SaltStack parle de `stat
 # Fonctionnement de base
 
 - Les minions restent connectés constamment au master (message bus ZeroMQ)
-- Le master doit accepter la clé d'un nouveau minion (PKI)
-- Sur le master, deux ports écoutent :
+- Sur le master, deux ports écoutent et doivent être accessibles pour les minions :
   - TCP/4505 : le bus de communication avec les minions
   - TCP/4506 : pour les messages de retour des minions
+- A la première connexion, le master doit accepter la clé d'un nouveau minion (PKI)
 - Le salt-master peut tourner en utilisateur non privilégié
 - Le salt-minion doit tourner en root
-- Fonctionne avec SELinux en mode `Enforcing`
+- Fonctionne avec SELinux en mode `Enforcing` actif sur le master et ses minions
 
 ---
 
@@ -515,16 +516,9 @@ salt-minion:
     True
 ```
 
-Attention, ceci n'est pas un ping ICMP !
+Attention, ceci n'est pas un ping ICMP ou TCP !
 
-Le minion exécute une fonction Python:
-
-```python
-def ping():
-    return True
-```
-
-Code simplifié issu de `/usr/lib/python2.7/site-packages/salt/modules/test.py` sur le minion.
+Voir `/usr/lib/python2.7/site-packages/salt/modules/test.py` sur le minion.
 
 ---
 
@@ -548,11 +542,13 @@ salt 'cible' module.fonction [arguments] [options salt]
 
 # Rappel avant d'écrire nos premières lignes de code
 
-Infracture as code (un bug dans le code = un downtime éventuel)
+Infracture as Code [0]: un bug dans le code = un downtime éventuel
 
-Nous sommes à présent des développeurs ! Définir des guidelines de développement (syntaxe, structure des fichiers, etc.)
+Nous sommes à présent des "DevOps" :
 
-Système de contrôle de versions (SVN, Git, etc.) avec un workflow de développement
+- Définir des guidelines de développement (syntaxe, structure des fichiers, etc.)
+- Définir un workflow de développement (centralisé, par branche, par fork, etc.)
+- Utiliser un système de contrôle de versions (Git, etc.) 
 
 Ne rien pousser en production qui n'a pas été testé et validé (principe des 4 yeux)
 
@@ -561,6 +557,8 @@ Et surtout :
 ## KISS : Keep It Simple, Stupid
 
 > La perfection est atteinte, non pas lorsqu'il n'y a plus rien à  ajouter, mais lorsqu'il n'y a plus rien à  retirer. ~ Antoine de Saint-Exupéry
+
+[0] https://en.wikipedia.org/Infrastructure_as_Code
 
 ---
 
