@@ -30,13 +30,29 @@ _20/04/2017_
 
 Administrateur systèmes chez ETNIC
 
-Gradué de l'Institut Supérieur Economique (ISE) de Mons en... comptabilité
+Gradué de l'Institut Supérieur Economique (ISE) de Mons en... comptabilité et gestion
 
-Blogger ([https://blog.wains.be](https://blog.wains.be))
+Blogger [https://blog.wains.be](https://blog.wains.be)
 
 Red Hat Certified Engineer
 
-Contribution à des projets Open Source
+Contribution à plusieurs projets Open Source
+
+---
+
+![bg 70%](./img/bg.png)
+
+<!-- page_number: true -->
+
+# ETNIC ?
+
+Organisme d'intérêt public
+
+Actif en Fédération Wallonie-Bruxelles
+
+Partenaire IT de la Fédération, Office National de l'Enfance, Maisons de Justice, etc.
+
+Plus de 200 employés (opérations, exploitation, développement)
 
 ---
 
@@ -50,7 +66,6 @@ Contribution à des projets Open Source
 - cloud provisioning
 - orchestration (ex : création VM > install rôle > import DB > install app)
 - monitoring
-
 - auto-scaling
 - compliance
 
@@ -80,10 +95,6 @@ Contribution à des projets Open Source
 ![bg 70%](./img/bg.png)
 
 <center><img src="./img/1.ico"></center>
-
-<center>Avec Salt</center>
-
-:wink:
 
 ---
 
@@ -115,7 +126,7 @@ Contribution à des projets Open Source
 
 # Un peu d'histoire
 
-#### En 2010, l'ETNIC avait environ 150 serveurs Linux (~ 80% virtuels)
+#### En 2010, l'ETNIC avait environ 150 serveurs Linux (~ 80% virtuels) hébergeant :
 
 - Des ressources techniques : DNS, relais SMTP, webmail, forward et reverse proxy, serveurs web, database, etc.
 - Des projets et applications métiers : ESB, data warehouse, gestion électronique documentaire, ERP, formulaires intelligents, CMS, etc.
@@ -133,12 +144,12 @@ Utilisateurs :
 
 # Un peu d'histoire
 
-#### Les problèmes constatés dès les premières semaines (1/2)
+#### Les problèmes constatés dès mes premières semaines (1/2)
 
 - Authentification `root` par mot de passe...
 - ...unique...
 - ...connu de presque tout le monde (devs, ops, consultants :sob:)
-- Des distributions différentes (SuSE Enterprise, OpenSuse, Debian, RedHat, RedHat Enterprise)
+- Des distributions différentes (SuSE Enterprise, OpenSuse, Debian, RedHat, RedHat Enterprise) dans toutes les versions possibles
 - Compilation au lieu d'utilisation de packages
 - Aucune gestion des mises à jour
 - Les backups sont des scripts exécutés par cron sur chaque serveur
@@ -158,6 +169,7 @@ Utilisateurs :
 - Installation OS entièrement à la main depuis un ISO
 - Tout n'est pas monitoré
 - Pas de documentation
+- Shadow IT
 - Un équivalent temps plein pour remettre de l'ordre dans tout ça...
 
 ---
@@ -191,7 +203,9 @@ Utilisateurs :
 
 <center><h1>Il faut faire face à la résistance au changement</h1>
 
-<center><h2>Des accès root en production ?<h2>
+---
+
+<center><h1>Des accès root en production ?<h1>
 
 ![150%](./img/root.jpg)
 
@@ -239,7 +253,7 @@ Et je ne gère alors que le strict minimum !
 - à l'époque Puppet est toujours en mode "pull"
 - la recommandation du formateur pour notre infrastructure était deux masters à raison d'un pull toutes les 30 minutes (risques : delta, charge et effet domino, etc.)
 - la gestion de configuration, l'exécution à distance et et la récupération d'informations depuis les nodes se font via trois composants installés séparément (Puppet, MCollective, Facter)
-- la syntaxe n'est pas très claire (Ruby DSL)
+- la syntaxe n'est pas très intuitive et lisible (Ruby DSL)
 
 #### Conclusion : pas vraiment convaincu
 
@@ -264,7 +278,7 @@ Et je ne gère alors que le strict minimum !
 
 ![bg 70%](./img/bg.png)
 
-# Les avantages (en 2013)
+# Les avantages (en 2013) (1/2)
 
 - Orchestration "event-driven" via un `event bus` sur le master
 - Haute disponibilité du rôle `salt-master` possible
@@ -278,7 +292,7 @@ Et je ne gère alors que le strict minimum !
 
 ![bg 70%](./img/bg.png)
 
-# Les avantages (en 2013)
+# Les avantages (en 2013) (2/2)
 
 - Mode push ET pull
 - Début d'un support de Windows
@@ -291,11 +305,11 @@ Et je ne gère alors que le strict minimum !
 
 ![bg 70%](./img/bg.png)
 
-# Les inconvénients (en 2013)
+# Les inconvénients (en 2013) (1/2)
 
-- Installation d'un agent (salt-minion) qui doit être dans la même version que le salt-master (alignement Debian/RedHat difficile)
+- Installation d'un agent (salt-minion) qui doit être dans la même version que le salt-master (alignement entre différents OS difficile)
 - Agent et ses dépendances (Python, ZeroMQ, msgpack) éparpillés dans les dépôts (Redhat, EPEL)
-- Language déclaratif (ordre d'exécution aléatoire si pas de dépendances entre actions)
+- Language déclaratif (ordre d'exécution aléatoire si pas de dépendances définies entre actions)
 - Communauté **trop** enthousiaste...
 - ... qui donne l'impression de partir un peu dans tous les sens : 
   - tout est en chantier, rien n'est abouti
@@ -307,7 +321,7 @@ Et je ne gère alors que le strict minimum !
 
 ![bg 70%](./img/bg.png)
 
-# Les inconvénients (en 2013)
+# Les inconvénients (en 2013) (2/2)
 
 - Release cycle trop rapide et sans test
 
@@ -325,12 +339,12 @@ Et je ne gère alors que le strict minimum !
 # Salt aujourd'hui
 
 - SaltStack fourni des dépôts avec toutes les dépendances [0]
-- Ils ont engagé une équipe de testeurs (notamment @ch3ll) : releases moins fréquentes, mieux testées, plus de régressions depuis longtemps
+- Ils ont engagé une équipe de testeurs : releases moins fréquentes, mieux testées, plus de régressions depuis longtemps
 - Le support de Windows et MacOS a bien avancé
 - Impératif ET déclaratif
 
 - Salt SSH pour gérer les "dumb" devices qui embarquent Python 2.6 ou plus
-- Salt Proxy pour gérer les "super dumb" devices n'embarquant pas de stack Python
+- Salt Proxy pour gérer certains "super dumb" devices sans stack Python
 - Salt API fonctionne ! Intégrations possibles avec Jenkins, Rundeck, Satellite, etc.
 - Un web GUI dans la version enterprise
 - Pas de support Python 3
@@ -392,12 +406,12 @@ Et je ne gère alors que le strict minimum !
 #### Glossaire
 
 `beacons` : fonctionnalité permettant de monitorer des processus hors Salt (charge système, RAM, fichier, nombre de sessions HAproxy, etc.) et envoyer des messages sur l'`event bus`  
-`reactors` : action déclenchée en réaction à un évenement sur l'`event bus`  
-`mine` : fonction du master qui collecte des données générées par des minions pour les rendre disponibles auprès des autres minions. Ces données sont supposées très dynamiques, avec un rafraichissement configurable
+`reactors` : action déclenchée en réaction à un évenement sur l'`event bus` 
+`mine` : fonction du master qui collecte des données très dynamiques générées par des minions pour les rendre disponibles auprès d'autres minions.
 
 **Remarque**
 
-Curieusement dans la documentation et la configuration, SaltStack parle de `states` et `grains` (pluriel) mais de `pillar` (singulier)
+Curieusement dans la documentation et la configuration, SaltStack parle de `states` et `grains` (pluriel) mais de `pillar` (singulier).
 
 ---
 
@@ -428,7 +442,7 @@ Curieusement dans la documentation et la configuration, SaltStack parle de `stat
 
 ![bg 70%](./img/bg.png)
 
-# Installation
+# Installation (RHEL)
 
 #### Sur chaque serveur :
 
@@ -491,12 +505,16 @@ Depuis le master : `salt-key -y -a salt-minion`
 
 # Vérifier le statut de nos minions
 
-```bash
+```
 [root@salt-master ~]# salt-key
+
 Accepted Keys:
-salt-minion <=================== notre minion est accepté :-)
+salt-minion
+
 Denied Keys:
+
 Unaccepted Keys:
+
 Rejected Keys:
 ```
 
@@ -526,7 +544,9 @@ Voir `/usr/lib/python2.7/site-packages/salt/modules/test.py` sur le minion.
 
 # Un autre exemple d'exécution distante
 
-salt 'cible' module.fonction [arguments] [options salt]
+`salt 'cible' module.fonction [arguments] [options salt]`
+
+Activation de SELinux :
 
 ```bash
 # salt 'salt-minion' selinux.setenforce Enforcing --output=json
@@ -589,6 +609,8 @@ Et surtout :
 
 # top.sls pour les states
 
+On assigne des states aux minions :
+
 ```yaml
 [root@salt-master /]# cat /srv/salt/states/top.sls
 base:
@@ -622,11 +644,11 @@ Notre état de configuration (fichier .sls, SaLt State) est écrit en YAML :
 
 ```yaml
 [root@salt-master ~]# cat /srv/salt/states/motd/init.sls
-ma_conf_motd:                    <-- ID unique
-  file.managed:                  <-- module.fonction (comme dans Python)
-    - name: /etc/motd            <-- le fichier géré
+ma_conf_motd:                          <-- ID unique
+  file.managed:                        <-- module.fonction
+    - name: /etc/motd                  <-- le fichier géré
     - source: salt://motd/motd.jinja   <-- template à utiliser
-    - template: jinja            <-- type de template
+    - template: jinja                  <-- type de template
 ```
 
 `salt://` est un serveur HTTP embarqué dans Salt, on peut spécifier d'autres types de sources : `http://`, `https://`, `ftp://`, `file://`, etc.
@@ -844,7 +866,7 @@ role-{{ i }}-conf:
 
 ![bg 70%](./img/bg.png)
 
-# Définir un grain automatiquement
+# Définir un nouveau grain automatiquement
 
 Il est possible de récupérer des informations provenant de différentes sources (CMDB, LDAP, DB, API, etc.) et de les stocker dans des grains sur nos minions.
 
@@ -878,9 +900,7 @@ def satellite_retrieve_info():
 
 ![bg 70%](./img/bg.png)
 
-# Pillars : stockage de données sensibles !
-
-Pour des raisons de performances, chaque `state` est mis en cache sur le minion à l'exécution de la commande `state.highstate`
+# Pillars : pour le stockage de données sensibles !
 
 Imaginons un state `mysql-users` :
 
@@ -890,6 +910,9 @@ bob:
     - host: localhost
     - password: eponge
 ```
+
+Pour des raisons de performances, chaque `state` est mis en cache sur le minion à l'exécution de la commande `state.highstate`
+
 Ce fichier sera mis en cache sur les minions sous `/var/cache/salt/minions/files/base/mysql-users/init.sls`
 
 #### ==> Problème de sécurité
@@ -900,7 +923,7 @@ Par contre, les pillars ne sont jamais conservés en cache !
 
 ![bg 70%](./img/bg.png)
 
-# Pillars : stockage de données sensibles !
+# Pillars : pour le stockage de données sensibles !
 
 Alternative avec utilisation d'un pillar :
 
@@ -918,7 +941,13 @@ bob:
     - password: {{ salt['pillar.get']('mysql:bob:password'), 'defaut' }}
 ```
 
-Rappel :
+---
+
+![bg 70%](./img/bg.png)
+
+# Pillars : pour le stockage de données sensibles !
+
+Rappels :
 
 - Les pillars sont conçus pour stocker des informations sensibles 
 - Ils ne sont jamais stockés sur les minions
@@ -947,7 +976,7 @@ Privilégier la méthode `salt['module.function']` plus avancée et permettant d
 
 ![bg 70%](./img/bg.png)
 
-# Que se passe-t'il sur le bus ?
+# Que se passe-t'il sur l'event bus ?
 
 `salt-run state.event pretty=True` montre les events sur le master :
 
@@ -980,7 +1009,7 @@ salt/minion/jdl-minion1/start	{
 
 # Les reactors
 
-Réaction à un events sur le bus, configuré sur le master dans `/etc/salt/master` :
+Réactions à des events sur le bus, configurés sur le master dans `/etc/salt/master` :
 
 ```yaml
 reactor:
@@ -1005,7 +1034,7 @@ hipchat:
         notify: False
 ```
 
-A chaque retour d'un minion, envoyer une notification Hipchat.
+A chaque retour d'un minion, envoyer une notification vers Hipchat.
 
 ---
 
@@ -1017,9 +1046,9 @@ A chaque retour d'un minion, envoyer une notification Hipchat.
 
 Le runner `state.orchestrate` s'exécute sur le master et permet d'appliquer les états de manière orchestrée dans un ordre défini et coordonné, par exemple : 
 
-- installer la base de données
-- installer le serveur applicatif backend
-- reconfigurer le reverse proxy frontend
+- installer la base de données sur le serveur ayant le rôle `mysql`
+- installer le serveur applicatif sur les serveurs `backend` 
+- reconfigurer le reverse proxy `frontend`
 
 ---
 
@@ -1033,14 +1062,14 @@ Le runner `state.orchestrate` s'exécute sur le master et permet d'appliquer les
 
 On peut donc imaginer une fonctionnalité webhook avec un reactor.
 
-Par exemple :
+Exemples :
 - ouverture automatique d'un ticket lors d'un événement sur le bus
-- déclencher un job Jenkins
+- déclencher un job Jenkins dès l'apparition d'un nouveau minion
 
 #### Salt fourni un service REST
 
 Exemple : 
-- déclencher une action Salt après exécution d'un job Jenkins (déployer un nouvel artefact)
+- déclencher une action Salt après exécution d'un job Jenkins (déploiement d'un nouvel artefact)
 
 ---
 
@@ -1073,13 +1102,13 @@ Permet de créer des machines virtuelles à partir de profils, sur différentes 
 
 <center><h1>L'ETNIC est régulièrement à la recherche de nouveaux talents !</h1></center>
 
-<center><h1>https://monjob.etnic.be</center>
+<center><h1><a href=https://monjob.etnic.be">https://monjob.etnic.be</a></center>
 
 ---
 
 ![bg 70%](./img/bg.png)
 
-# Questions et (tentatives de) réponses
+<center><h1>Questions ?</h1></center>
 
 ---
 
@@ -1087,4 +1116,4 @@ Permet de créer des machines virtuelles à partir de profils, sur différentes 
 
 <center><img src="./img/qrcode.jpg" height="600"></center>
 
-# Merci et à tout de suite ! :beer::beer::beer:
+<center><h1>Merci et à tout de suite ! </h1></center>
