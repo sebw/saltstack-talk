@@ -813,7 +813,9 @@ Les modules se chargent de "deviner" les utilitaires à utiliser.
 
 Noms de packages différents entre distributions (`apache2` vs `httpd`) ?
 
-Définir des "map files" ! (mélange de YAML et jinja)
+Définir des "map files" ! 
+
+Exemple : https://github.com/saltstack-formulas/vim-formula/blob/master/vim/map.jinja
 
 ---
 
@@ -1008,7 +1010,10 @@ salt/minion/jdl-minion1/start	{
     "tag": "salt/minion/jdl-minion1/start"
 }
 ```
+
 ---
+
+![bg 70%](./img/bg.png)
 
 # Les reactors
 
@@ -1038,6 +1043,38 @@ hipchat:
 ```
 
 A chaque retour d'un minion, envoyer une notification vers Hipchat.
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Salt API
+
+Configuration /etc/salt/master
+
+```
+rest_cherrypy:
+  port: 8080
+  host: 0.0.0.0
+  disable_ssl: False
+  ssl_crt: /etc/ssl/private/cert.pem
+  ssl_key: /etc/ssl/private/key.pem
+  webhook_disable_auth: True
+  webhook_url: /hook
+  debug: False
+```
+
+Démarrer : `systemctl start salt-api`
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Reactors sur appels API
+
+Event sur le bus : `salt/netapi/*`
+
+https://github.com/saltstack-formulas/salt-api-reactor-formula
 
 ---
 
