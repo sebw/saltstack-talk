@@ -60,14 +60,15 @@ Plus de 200 employés (opérations, exploitation, développement)
 
 # Que permet Salt ?
 
-- exécution à distance (sa fonction première au début du projet)
-- gestion de configuration
+- exécution à distance asynchrone (sa fonction première au début du projet)
+- gestion de configuration centralisée
 - récupération d'informations
-- cloud provisioning
+- provisioning VM et cloud
 - orchestration (ex : création VM > install rôle > import DB > install app)
 - monitoring
 - auto-scaling
 - compliance
+- flexibilité et extensibilité
 
 ---
 
@@ -224,6 +225,7 @@ Utilisateurs :
 #### Pour faire pour un mieux et dans l'immédiat je commence sur ces standards
 
 - Installation d'un serveur : template VMware RHEL5 installation minimale
+- Politique de sécurité aux systèmes : clé SSH au lieu de mot de passe
 - Installation des services de base et leurs configurations : script bash
 
 
@@ -391,7 +393,7 @@ Et je ne gère alors que le strict minimum !
 `master` : serveur de gestion  
 `minion` : serveur géré  
 `modules` : module d'exécution distante ayant différentes fonctions (ex : file.managed)
-`states` : état de configuration (package installé, fichier configuré, service démarré, etc.)  
+`states` : déclaration de l'état d'un système (package installé, fichier configuré, service démarré, etc.)  
 `grains` : informations relativement statiques des minions  
 `pillar` : informations dynamiques stockées sur le master à disposition des minions  
 `top.sls` : les fichiers d'assignation de `states` et `pillars` aux minions  
@@ -408,6 +410,7 @@ Et je ne gère alors que le strict minimum !
 `beacons` : fonctionnalité permettant de monitorer des processus hors Salt (charge système, RAM, fichier, nombre de sessions HAproxy, etc.) et envoyer des messages sur l'`event bus`  
 `reactors` : action déclenchée en réaction à un évenement sur l'`event bus` 
 `mine` : fonction du master qui collecte des données très dynamiques générées par des minions pour les rendre disponibles auprès d'autres minions.
+`returners` : retourne l'"output" vers un système (stdout, DB, etc.)
 
 **Remarque**
 
@@ -423,13 +426,15 @@ Curieusement dans la documentation et la configuration, SaltStack parle de `stat
 
 <center><img src="./img/infra.png" height="500"></center>
 
+Communication chiffrée AES
+
 ---
 
 ![bg 70%](./img/bg.png)
 
 # Fonctionnement de base
 
-- Les minions restent connectés constamment au master (message bus ZeroMQ)
+- Les minions sont connectés constamment au master (message bus ZeroMQ ou RAET)
 - Sur le master, deux ports écoutent et doivent être accessibles pour les minions :
   - TCP/4505 : le bus de communication avec les minions
   - TCP/4506 : pour les messages de retour des minions
@@ -674,9 +679,9 @@ Mon master est {{ grains['master'] }}
 
 ![bg 70%](./img/bg.png)
 
-# Notre premier state : `motd`
+# Grains : informations concernant nos minions
 
-Pour lister les grains disponibles sur un minion :
+Pour lister les grains disponibles par défaut :
 
 ```yaml
 [root@salt-master ~]# salt 'salt-minion' grains.items
@@ -808,7 +813,7 @@ Les modules se chargent de "deviner" les utilitaires à utiliser.
 
 Noms de packages différents entre distributions (`apache2` vs `httpd`) ?
 
-Définir des "map files" ! (ressemble fortement à un template jinja)
+Définir des "map files" ! (mélange de YAML et jinja)
 
 ---
 
@@ -827,8 +832,6 @@ Définir des "map files" ! (ressemble fortement à un template jinja)
 ...
 {% endif %}
 ```
-
-Les grains à notre disposition sont nombreux, mais est-ce suffisant ?
 
 ---
 
