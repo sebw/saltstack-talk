@@ -64,7 +64,7 @@ Plus de 200 employés (opérations, exploitation, développement)
 - gestion de configuration centralisée
 - récupération d'informations
 - provisioning VM et cloud
-- orchestration (ex : création VM > install rôle > import DB > install app)
+- orchestration
 - monitoring
 - auto-scaling
 - compliance
@@ -136,7 +136,7 @@ Utilisateurs :
 
 - 160 employés ETNIC
 - 5000 utilisateurs au Ministère de la Communauté Française
-- 1100 utilisateurs à l'ONE
+- 1500 utilisateurs à l'ONE
 - 130000 enseignants
 
 ---
@@ -225,7 +225,7 @@ Utilisateurs :
 #### Pour faire pour un mieux et dans l'immédiat je commence sur ces standards
 
 - Installation d'un serveur : template VMware RHEL5 installation minimale
-- Politique de sécurité aux systèmes : clé SSH au lieu de mot de passe
+- Politique de sécurité d'accès aux systèmes : clé SSH au lieu de mot de passe
 - Installation des services de base et leurs configurations : script bash
 
 
@@ -635,7 +635,7 @@ Pour les OS de type `RedHat`, appliquer le state `selinux`.
 
 Pour les machines avec le ROLE custom `solr`, appliquer le state `solr`.
 
-Ne jamais cibler un serveur sur base de son nom ! Le top.sls doit être le plus **générique** possible.
+Conseil : le top.sls doit être le plus **générique** possible. Ne pas cibler sur base du nom mais préférer le rôle.
 
 ---
 
@@ -1117,7 +1117,7 @@ Exemple :
 
 # Salt Cloud
 
-Permet de créer des machines virtuelles à partir de profils, sur différentes plateformes "cloud" telles que :
+Permet de créer des machines virtuelles à partir de profils, sur différentes plateformes "cloud" et de virtualisation telles que :
 - VMware 
 - Proxmox
 - Openshift
@@ -1125,6 +1125,73 @@ Permet de créer des machines virtuelles à partir de profils, sur différentes 
 - Google
 - Parallels
 - etc.
+
+Salt Cloud est installé avec le package salt-master.
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Salt Cloud
+
+Définir un "provider" sous `/etc/salt/cloud.providers.d/vmware.conf` :
+
+```
+vcenter01:
+  driver: vmware
+  user: 'DOMAIN\user'
+  password: 'verybadpass'
+  url: 'vcenter01.domain.com'
+  protocol: 'https'
+  port: 443
+```
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Salt Cloud
+
+Définir un "profile" sous `/etc/salt/cloud.profiles.d/vmware.conf` : 
+
+```yaml
+vmware-centos7.3:
+  provider: vcenter01
+  clonefrom: template-centos73
+  num_cpus: 4
+  memory: 8GB
+  devices:
+    disk:
+      Hard disk 2:
+        size: 20
+        controller: SCSI controller 2
+    network:
+      Network adapter 1:
+        name: VLAN30
+        switch_type: standard
+        ip: 10.20.30.123
+        gateway: [10.20.30.110]
+        subnet_mask: 255.255.255.128
+        domain: example.com
+
+  domain: example.com
+  dns_servers:
+    - 123.127.255.240
+    - 123.127.255.241
+```
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Salt Cloud
+
+Instancier une VM :
+
+`salt-cloud -p vmware-centos7.3 nom-vm.example.com`
+
+A la création de la VM, salt-minion est installé et attaché automatiquement au master.
+
 
 ---
 
