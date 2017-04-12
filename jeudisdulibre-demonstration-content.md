@@ -4,6 +4,8 @@
 
 Disable flux
 
+Disable any source of notification (chat, browsers, etc.)
+
 ## Getting started
 
 - install salt-master RHEL + config

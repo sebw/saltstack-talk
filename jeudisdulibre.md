@@ -46,11 +46,13 @@ Contribution à plusieurs projets Open Source
 
 # ETNIC ?
 
-Organisme d'intérêt public
+**E**ntreprise des **T**echnologies **N**ouvelles de l'**I**nformation et **C**ommunication
 
-Actif en Fédération Wallonie-Bruxelles
+OIP : **o**rganisme d'**i**ntérêt **p**ublic
 
-Partenaire IT de la Fédération, Office National de l'Enfance, Maisons de Justice, etc.
+Organisme actif en Fédération Wallonie-Bruxelles (FWB)
+
+Partenaire IT de la FWB, Office National de l'Enfance, Maisons de Justice, etc.
 
 Plus de 200 employés (opérations, exploitation, développement)
 
@@ -138,6 +140,7 @@ Utilisateurs :
 - 5000 utilisateurs au Ministère de la Communauté Française
 - 1500 utilisateurs à l'ONE
 - 130000 enseignants
+- citoyens
 
 ---
 
@@ -202,6 +205,8 @@ Utilisateurs :
 
 ---
 
+![bg 70%](./img/bg.png)
+
 <center><h1>Il faut faire face à la résistance au changement</h1>
 
 ---
@@ -257,7 +262,7 @@ Et je ne gère alors que le strict minimum !
 - la gestion de configuration, l'exécution à distance et et la récupération d'informations depuis les nodes se font via trois composants installés séparément (Puppet, MCollective, Facter)
 - la syntaxe n'est pas très intuitive et lisible (Ruby DSL)
 
-#### Conclusion : pas vraiment convaincu
+#### Conclusion : (toujours) pas vraiment convaincu
 
 ---
 
@@ -366,7 +371,7 @@ Et je ne gère alors que le strict minimum !
 - Cinq salt-master (1x lab par sysadmin, 1x non prod, 1x prod)
 - Encore quelques serveurs legacy non gérables :bomb:
 - Un nouveau serveur virtuel RHEL7 complètement provisionné et intégré en moins de 12 minutes grâce à Salt Cloud et Rundeck [0]
-- Tout le code dans un dépôt Gitlab
+- Tout le code dans un dépôt Gitlab interne
 - Développement sur base d'un workflow collaboratif [1]
 
 [0] [http://www.rundeck.org](http://www.rundeck.org)
@@ -447,7 +452,7 @@ Communication chiffrée AES
 
 ![bg 70%](./img/bg.png)
 
-# Installation (RHEL)
+# Installation (RHEL/CentOS)
 
 #### Sur chaque serveur :
 
@@ -560,6 +565,19 @@ Activation de SELinux :
 }
 ```
 
+---
+
+![bg 70%](./img/bg.png)
+
+# Appliquer les configurations
+
+Appliquer les états de configuration définis dans top.sls : 
+
+`salt 'cible' state.highstate`
+
+Tester sans appliquer en mode verbose :
+
+`salt 'cible' state.highstate -v test=True`
 
 ---
 
@@ -736,6 +754,10 @@ Total states run:     2
 Total run time:  79.083 ms                                         79 ms !
 ```
 
+
+
+
+
 ---
 
 ![bg 70%](./img/bg.png)
@@ -907,18 +929,19 @@ def satellite_retrieve_info():
 
 # Pillars : pour le stockage de données sensibles !
 
-Imaginons un state `mysql-users` :
+Imaginons un state `mysql` :
 
 ```jinja
-bob:
+mysql-bob:
   mysql_user.present:
+    - name: bob
     - host: localhost
     - password: eponge
 ```
 
 Pour des raisons de performances, chaque `state` est mis en cache sur le minion à l'exécution de la commande `state.highstate`
 
-Ce fichier sera mis en cache sur les minions sous `/var/cache/salt/minions/files/base/mysql-users/init.sls`
+Ce fichier sera mis en cache sur les minions sous `/var/cache/salt/minions/files/base/mysql/init.sls`
 
 #### ==> Problème de sécurité
 
@@ -935,8 +958,8 @@ Alternative avec utilisation d'un pillar :
 /srv/salt/pillars/mysql/init.sls
 ```
 mysql:
- bob:
-   password: eponge
+  bob:
+    password: eponge
 ```
 /srv/salt/states/mysql/init.sls
 ```
@@ -955,8 +978,9 @@ bob:
 Rappels :
 
 - Les pillars sont conçus pour stocker des informations sensibles 
-- Ils ne sont jamais stockés sur les minions
+- Ils ne sont **jamais** stockés sur les minions
 - Limiter leur utilisation aux données sensibles
+- A chaque appel d'un pillar, un canal de communication dédié et crypté est établi entre le master et le minion
 - Problème de performances potentiel si beaucoup trop de pillars (pas dans la doc !)
 
 ---
@@ -1024,7 +1048,7 @@ reactor:
   - 'salt/minion/*/start':
     - /srv/salt/reactors/start.sls
   - 'salt/cloud/*/destroyed':
-    - /srv/reactor/destroy/*.sls
+    - /srv/salt/reactors/destroy/*.sls
 ```
 
 /srv/salt/reactors/start.sls :
