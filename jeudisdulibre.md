@@ -1010,13 +1010,6 @@ Privilégier la méthode `salt['module.function']` plus avancée et permettant d
 `salt-run state.event pretty=True` montre les events sur le master :
 
 ```
-salt/auth	{
-    "_stamp": "2017-02-21T07:59:27.659924",
-    "act": "accept",
-    "id": "jdl-minion1",
-    "pub": "-----BEGIN PUBLIC KEY-----.........",
-    "result": true
-}
 minion_start	{
     "_stamp": "2017-02-21T07:59:28.146292",
     "cmd": "_minion_event",
@@ -1034,6 +1027,8 @@ salt/minion/jdl-minion1/start	{
     "tag": "salt/minion/jdl-minion1/start"
 }
 ```
+
+**Astuce :** pour monitorer l'état d'avancement d'un highstate sur le bus, activer `state_events: True` dans la configuration du master.
 
 ---
 
