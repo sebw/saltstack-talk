@@ -6,6 +6,16 @@ Disable flux
 
 Disable any source of notification (chat, browsers, etc.)
 
+Deploy 3 VM :
+
+- jdl-master
+- jdl-minion1
+- jdl-minion2
+
+Get their IP
+
+Edit /etc/hosts on each
+
 ## Getting started
 
 - install salt-master RHEL + config
@@ -27,7 +37,7 @@ pillar_roots:
 /etc/salt/minion
 
 ```
-master: 10.1.1.17
+master: jdl-master
 ```
 
 - systemctl stop firewalld on master
@@ -164,9 +174,27 @@ password={{ salt['pillar.get']('postfix:password2', 'valeur par defaut') }}
 
 ## Reactors
 
-Show events on master bus : `salt-run state.event pretty=True`
+Show events on master bus: `salt-run state.event pretty=True`
 
-Faire : `salt 'jdl-minion' test.ping -v`
+Send a custom event on the bus from minion: `salt-call event.send /my/custom/event '{"data": "JDL"}'`
+
+```
+/my/custom/event	{
+    "_stamp": "2017-04-13T10:03:35.854050",
+    "cmd": "_minion_event",
+    "data": {
+        "__pub_fun": "event.send",
+        "__pub_jid": "20170413060330447842",
+        "__pub_pid": 3405,
+        "__pub_tgt": "salt-call",
+        "data": "JDL"
+    },
+    "id": "jdl-minion",
+    "tag": "/my/custom/even"
+}
+```
+
+Run: `salt 'jdl-minion' test.ping -v`
 
 ```
 salt/job/20170411144701244715/new	{
