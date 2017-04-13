@@ -1192,11 +1192,11 @@ vmware-centos7.3:
         gateway: [10.20.30.110]
         subnet_mask: 255.255.255.128
         domain: example.com
-
   domain: example.com
   dns_servers:
-    - 123.127.255.240
-    - 123.127.255.241
+    - 10.20.30.21
+  script: bootstrap-salt
+  script_args: -H proxy.example.org:8080 stable 2016.11
 ```
 
 ---
@@ -1209,7 +1209,7 @@ Instancier une VM :
 
 `salt-cloud -p vmware-centos7.3 nom-vm.example.com`
 
-A la création de la VM, salt-minion est installé et attaché automatiquement au master.
+A la création de la VM, salt-minion est installé et attaché automatiquement au master grâce au script bootstrap fourni dans le package commun salt (options `script` et `script_args`)
 
 
 ---
