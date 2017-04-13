@@ -52,7 +52,7 @@ OIP : **o**rganisme d'**i**ntérêt **p**ublic
 
 Organisme actif en Fédération Wallonie-Bruxelles (FWB)
 
-Partenaire IT de la FWB, Office National de l'Enfance, Maisons de Justice, etc.
+Partenaire ICT de la FWB, Office National de l'Enfance, Maisons de Justice, etc.
 
 Plus de 200 employés (opérations, exploitation, développement)
 
@@ -153,7 +153,7 @@ Utilisateurs :
 - Authentification `root` par mot de passe...
 - ...unique...
 - ...connu de presque tout le monde (devs, ops, consultants :sob:)
-- Des distributions différentes (SuSE Enterprise, OpenSuse, Debian, RedHat, RedHat Enterprise) dans toutes les versions possibles
+- Des distributions différentes (SuSE Enterprise, OpenSuse, Debian, RedHat, RedHat Enterprise) dans toutes les versions possibles en 32 et 64 bits
 - Compilation au lieu d'utilisation de packages
 - Aucune gestion des mises à jour
 - Les backups sont des scripts exécutés par cron sur chaque serveur
@@ -229,7 +229,7 @@ Utilisateurs :
 
 #### Pour faire pour un mieux et dans l'immédiat je commence sur ces standards
 
-- Installation d'un serveur : template VMware RHEL5 installation minimale
+- Installation d'un serveur : template VMware RHEL5 64 bits installation minimale
 - Politique de sécurité d'accès aux systèmes : clé SSH au lieu de mot de passe
 - Installation des services de base et leurs configurations : script bash
 
@@ -291,7 +291,6 @@ Et je ne gère alors que le strict minimum !
 - Haute disponibilité du rôle `salt-master` possible
 - Ecrit en Python avec des possibilités d'extensions intéressantes
 - YAML et Jinja (mais attention à la syntaxe !)
-- Modèle client/serveur (`salt-minion`/`salt-master`)
 - `salt-syndic` pour les grosses infrastructures ("proxy")
 - Mode masterless possible (code sur le minion)
 
@@ -315,12 +314,12 @@ Et je ne gère alors que le strict minimum !
 # Les inconvénients (en 2013) (1/2)
 
 - Installation d'un agent (salt-minion) qui doit être dans la même version que le salt-master (alignement entre différents OS difficile)
-- Agent et ses dépendances (Python, ZeroMQ, msgpack) éparpillés dans les dépôts (Redhat, EPEL)
+- Agent et ses dépendances (Python, ZeroMQ, msgpack) éparpillés dans les dépôts (RedHat, EPEL)
 - Language déclaratif (ordre d'exécution aléatoire si pas de dépendances définies entre actions)
 - Communauté **trop** enthousiaste...
 - ... qui donne l'impression de partir un peu dans tous les sens : 
   - tout est en chantier, rien n'est abouti
-  - installation de Salt-API impossible 
+  - installation de Salt API impossible 
   - pas de support VMware dans Salt-Cloud
   - pull requests acceptés 5 minutes montre en main
 
@@ -349,7 +348,6 @@ Et je ne gère alors que le strict minimum !
 - Ils ont engagé une équipe de testeurs : releases moins fréquentes, mieux testées, plus de régressions depuis longtemps
 - Le support de Windows et MacOS a bien avancé
 - Impératif ET déclaratif
-
 - Salt SSH pour gérer les "dumb" devices qui embarquent Python 2.6 ou plus
 - Salt Proxy pour gérer certains "super dumb" devices sans stack Python
 - Salt API fonctionne ! Intégrations possibles avec Jenkins, Rundeck, Satellite, etc.
@@ -397,6 +395,7 @@ Et je ne gère alors que le strict minimum !
 
 `master` : serveur de gestion  
 `minion` : serveur géré  
+`event bus` : bus de communication pour les échanges entre master et minions
 `modules` : module d'exécution distante ayant différentes fonctions (ex : file.managed)
 `states` : déclaration de l'état d'un système (package installé, fichier configuré, service démarré, etc.)  
 `grains` : informations relativement statiques des minions  
@@ -413,7 +412,7 @@ Et je ne gère alors que le strict minimum !
 #### Glossaire
 
 `beacons` : fonctionnalité permettant de monitorer des processus hors Salt (charge système, RAM, fichier, nombre de sessions HAproxy, etc.) et envoyer des messages sur l'`event bus`  
-`reactors` : action déclenchée en réaction à un évenement sur l'`event bus` 
+`reactors` : actions déclenchées en réaction à un évenement sur l'`event bus` 
 `mine` : fonction du master qui collecte des données très dynamiques générées par des minions pour les rendre disponibles auprès d'autres minions.
 `returners` : retourne l'"output" vers un système (stdout, DB, etc.)
 
@@ -485,7 +484,7 @@ pillar_roots:
     - /srv/salt/pillars
 ```
 
-Démarrage du service : `service salt-master start`
+Démarrage du service : `systemctl start salt-master`
 
 Démarrage en mode debug : `salt-master -l debug`
 
@@ -501,7 +500,7 @@ Démarrage en mode debug : `salt-master -l debug`
 master: salt-master
 ```
 
-Démarrage du service : `service salt-minion start`
+Démarrage du service : `systemctl start salt-minion`
 
 Démarrage en mode debug : `salt-minion -l debug`
 
@@ -511,7 +510,7 @@ Démarrage en mode debug : `salt-minion -l debug`
 
 # Accepter un minion
 
-Depuis le master : `salt-key -y -a salt-minion` 
+Depuis le master : `salt-key -a salt-minion` 
 
 # Vérifier le statut de nos minions
 
@@ -571,7 +570,7 @@ Activation de SELinux :
 
 # Appliquer les configurations
 
-Appliquer les états de configuration définis dans top.sls : 
+Appliquer les états de configuration définis dans `top.sls` : 
 
 `salt 'cible' state.highstate`
 
@@ -583,11 +582,11 @@ Tester sans appliquer en mode verbose :
 
 ![bg 70%](./img/bg.png)
 
-# Rappel avant d'écrire nos premières lignes de code
+# Recommandations avant d'écrire nos premières lignes de code
 
-Infracture as Code [0]: un bug dans le code = un downtime éventuel
+Infrastructure as Code [0] : un bug dans le code = un downtime éventuel
 
-Nous sommes à présent des "DevOps" :
+Nous sommes à présent des sysadmins développeurs :
 
 - Définir des guidelines de développement (syntaxe, structure des fichiers, etc.)
 - Définir un workflow de développement (centralisé, par branche, par fork, etc.)
@@ -943,7 +942,7 @@ Pour des raisons de performances, chaque `state` est mis en cache sur le minion 
 
 Ce fichier sera mis en cache sur les minions sous `/var/cache/salt/minions/files/base/mysql/init.sls`
 
-#### ==> Problème de sécurité
+#### ==> Problème potentiel de sécurité
 
 Par contre, les pillars ne sont jamais conservés en cache !
 
@@ -979,9 +978,8 @@ Rappels :
 
 - Les pillars sont conçus pour stocker des informations sensibles 
 - Ils ne sont **jamais** stockés sur les minions
-- Limiter leur utilisation aux données sensibles
 - A chaque appel d'un pillar, un canal de communication dédié et crypté est établi entre le master et le minion
-- Problème de performances potentiel si beaucoup trop de pillars (pas dans la doc !)
+- Problème de performance potentiel si beaucoup trop de pillars (pas dans la doc !)
 
 ---
 
@@ -1053,7 +1051,7 @@ hipchat:
   local.hipchat.send_message:
     - tgt: jdl-master
     - kwarg:
-        room_id: Notifications-SRV
+        room_id: Notifications
         from_name: Master
         message: "Démarrage de {{ data['id'] }} à {{ data['_stamp'] }}"
         api_key: xxx
@@ -1061,7 +1059,7 @@ hipchat:
         notify: False
 ```
 
-A chaque retour d'un minion, envoyer une notification vers Hipchat.
+==> au démarrage d'un minion, envoyer une notification vers Hipchat.
 
 ---
 
@@ -1091,7 +1089,7 @@ Démarrer : `systemctl start salt-api`
 
 # Reactors sur appels API
 
-Event sur le bus : `salt/netapi/*`
+Events sur le bus : `salt/netapi/*`
 
 https://github.com/saltstack-formulas/salt-api-reactor-formula
 
@@ -1209,7 +1207,7 @@ Instancier une VM :
 
 `salt-cloud -p vmware-centos7.3 nom-vm.example.com`
 
-A la création de la VM, salt-minion est installé et attaché automatiquement au master grâce au script bootstrap fourni dans le package commun salt (options `script` et `script_args`)
+A la création de la VM, salt-minion est installé et attaché automatiquement au master grâce au script bootstrap fourni par Salt (options `script` et `script_args`)
 
 
 ---

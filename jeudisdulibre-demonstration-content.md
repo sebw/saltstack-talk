@@ -51,8 +51,7 @@ master: jdl-master
 - remote execution
 	- cmd.run
 	- iptables.version
-	- selinux.getenforce (will show something is missing, deps on policycoreutils-python package to install)
-	- pkg.install telnet
+	- selinux.getenforce (will show something is missing, install pkg in next step)	- pkg.install policycoreutils-python
 	
 ## Configuration Management
 
@@ -90,8 +89,8 @@ jdl-minion:
         - motd
 ```
 
-- reminder: grains.items
-- jinja template: use "os" or "mem_total" grains
+- reminder: `grains.items` and `grains.item grain_name`
+- jinja template: use `os` or `mem_total` grains
 - declare custom grain with multiple values `salt 'jdl-minion' grains.setval ROLE ['solr','apache']`
 - use custom grain in MOTD and display raw result first then prettify it with jinja logic
 
@@ -291,7 +290,7 @@ import requests
 
 def custom_grain():
 	grains = {}
-	r = requests.get("http://10.1.1.8")
+	r = requests.get("http://jdl-master")
 	grains['zzz_custom'] = r.json()
 	return grains
 ```
