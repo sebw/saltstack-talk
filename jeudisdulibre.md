@@ -42,24 +42,6 @@ Contribution à plusieurs projets Open Source
 
 ![bg 70%](./img/bg.png)
 
-<!-- page_number: true -->
-
-# ETNIC ?
-
-**E**ntreprise des **T**echnologies **N**ouvelles de l'**I**nformation et **C**ommunication
-
-OIP : **o**rganisme d'**i**ntérêt **p**ublic
-
-Organisme actif en Fédération Wallonie-Bruxelles (FWB)
-
-Partenaire ICT de la FWB, Office National de l'Enfance, Maisons de Justice, etc.
-
-Plus de 200 employés (opérations, exploitation, développement)
-
----
-
-![bg 70%](./img/bg.png)
-
 # Que permet Salt ?
 
 - exécution à distance asynchrone (sa fonction première au début du projet)
@@ -101,184 +83,16 @@ Plus de 200 employés (opérations, exploitation, développement)
 
 ---
 
-![bg 70%](./img/bg.png)
-
-# Les précurseurs
-
-|Projet|Année|
-|:-:|:-:|
-|CFEngine|1993|
-|Puppet|2005|
-|Chef|2009|
-
----
-
-![bg 70%](./img/bg.png)
-
-# Les petits "nouveaux"
-
-|Projet|Année|GitHub|
-|:-:|:-:|:-|
-|Rexify|2010|![](./img/github-rexify.png)`
-|Salt|2011|![](./img/github-salt.png)
-|Ansible|2012|![](./img/github-ansible.png)
-
----
-
-![bg 70%](./img/bg.png)
-
-# Un peu d'histoire
-
-#### En 2010, l'ETNIC avait environ 150 serveurs Linux (~ 80% virtuels) hébergeant :
-
-- Des ressources techniques : DNS, relais SMTP, webmail, forward et reverse proxy, serveurs web, database, etc.
-- Des projets et applications métiers : ESB, data warehouse, gestion électronique documentaire, ERP, formulaires intelligents, CMS, etc.
-
-Utilisateurs : 
-
-- 160 employés ETNIC
-- 5000 utilisateurs au Ministère de la Communauté Française
-- 1500 utilisateurs à l'ONE
-- 130000 enseignants
-- citoyens
-
----
-
-![bg 70%](./img/bg.png)
-
-# Un peu d'histoire
-
-#### Les problèmes constatés dès mes premières semaines (1/2)
-
-- Authentification `root` par mot de passe...
-- ...unique...
-- ...connu de presque tout le monde (devs, ops, consultants :sob:)
-- Des distributions différentes (SuSE Enterprise, OpenSuse, Debian, RedHat, RedHat Enterprise) dans toutes les versions possibles en 32 et 64 bits
-- Compilation au lieu d'utilisation de packages
-- Aucune gestion des mises à jour
-- Les backups sont des scripts exécutés par cron sur chaque serveur
-
----
-
-![bg 70%](./img/bg.png)
-
-# Un peu d'histoire
-
-#### Les problèmes constatés dès les premières semaines (2/2)
-
-- Des services importants tels que SSH, NTP, SMTP, DNS mal ou pas configurés
-- Des inconsistences entre environnements d'un même projet ou nodes d'un même cluster
-- Pas d'authentification centralisée
-- Quasi aucun service sécurisé par SSL
-- Installation OS entièrement à la main depuis un ISO
-- Tout n'est pas monitoré
-- Pas de documentation
-- Shadow IT
-- Un équivalent temps plein pour remettre de l'ordre dans tout ça...
-
----
-
-![bg 70%](./img/bg.png)
-
-# Un peu d'histoire
-
-## Par où commencer ?
-
-#### Les challenges techniques
-
-- La situation est problématique partout
-- Il faut définir : 
-  - des standards
-  - des politiques de sécurité, de mises à jours, de monitoring, de backup, etc.
-  - des nouvelles méthodes de travail
-- Il faut améliorer :
-  - le processus de création de nouveaux serveurs
-  - **... la gestion de leur configuration !**
-- Et migrer, migrer, migrer le legacy !
-- En plus de travailler sur les nouveaux projets
-
----
-
-![bg 70%](./img/bg.png)
-
-<center><h1>Les challenges ne sont pas que techniques !</h1></center>
-
----
-
-![bg 70%](./img/bg.png)
-
-<center><h1>Il faut faire face à la résistance au changement</h1>
-
----
-
-<center><h1>Des accès root en production ?<h1>
-
-![150%](./img/root.jpg)
-
----
-
-<center><h1>L'accueil a parfois été mitigé</h1>
-
-![150%](./img/devs-without-root.jpg)</center>
-
----
-
-![bg 70%](./img/bg.png)
-
-# Un peu d'histoire
-
-#### Pour faire pour un mieux et dans l'immédiat je commence sur ces standards
-
-- Installation d'un serveur : template VMware RHEL5 64 bits installation minimale
-- Politique de sécurité d'accès aux systèmes : clé SSH au lieu de mot de passe
-- Installation des services de base et leurs configurations : script bash
-
-
----
-
-![bg 70%](./img/bg.png)
-
-# Un peu d'histoire
-
-### Mais après à peine quelques semaines...
-
-```
-$ wc -l install_rhel.sh 
-664 install_rhel.sh
-```
-
-Et je ne gère alors que le strict minimum !
-
----
-
-![bg 70%](./img/bg.png)
-
-# Pourquoi pas... Puppet ?
-
-#### Fin 2011 je participe à une formation Puppet
-
-- à l'époque Puppet est toujours en mode "pull"
-- la recommandation du formateur pour notre infrastructure était deux masters à raison d'un pull toutes les 30 minutes (risques : delta, charge et effet domino, etc.)
-- la gestion de configuration, l'exécution à distance et et la récupération d'informations depuis les nodes se font via trois composants installés séparément (Puppet, MCollective, Facter)
-- la syntaxe n'est pas très intuitive et lisible (Ruby DSL)
-
-#### Conclusion : (toujours) pas vraiment convaincu
-
----
-
-# Pourquoi Salt ? La genèse...
+# Pourquoi Salt ?
 
 ![bg 70%](./img/bg.png)
 
 #### Premiers tests en mai 2013
 
-- deux principaux types de noeuds : 
-  - un serveur `salt-master` 
-  - des clients `salt-minion`
-- gestion de configuration de services de base pour commencer, afin de remplacer le script (SSH, SMTP, NTP)
+- gestion de configuration de services de base pour commencer (SSH, SMTP, NTP)
 - remote execution (`yum upgrade x`, `uptime`)
 - récupération d'informations sur le parc (CPU, mémoire, version OS)
-- code dans SVN
+- code dans un dépôt SVN
 - test du code via `test=True` avant de pousser en production
 
 ---
@@ -290,9 +104,9 @@ Et je ne gère alors que le strict minimum !
 - Orchestration "event-driven" via un `event bus` sur le master
 - Haute disponibilité du rôle `salt-master` possible
 - Ecrit en Python avec des possibilités d'extensions intéressantes
-- YAML et Jinja (mais attention à la syntaxe !)
+- Configuration YAML et templates Jinja (mais attention à la syntaxe !)
 - `salt-syndic` pour les grosses infrastructures ("proxy")
-- Mode masterless possible (code sur le minion)
+- Mode masterless possible (code sur le serveur géré "minion")
 
 ---
 
@@ -320,7 +134,7 @@ Et je ne gère alors que le strict minimum !
 - ... qui donne l'impression de partir un peu dans tous les sens : 
   - tout est en chantier, rien n'est abouti
   - installation de Salt API impossible 
-  - pas de support VMware dans Salt-Cloud
+  - pas de support VMware dans Salt Cloud
   - pull requests acceptés 5 minutes montre en main
 
 ---
@@ -362,12 +176,9 @@ Et je ne gère alors que le strict minimum !
 
 # Salt à l'ETNIC aujourd'hui
 
-- L'équipe Linux a triplé il y a un an, par l'engagement de deux sysadmins Linux junior. Salt a été adopté immédiatement et avec enthousiasme :smiley:
-- Un consultant de SaltStack est venu auditer notre infrastructure en décembre 2016
 - Version actuelle Salt Community en release stable (2016.11)
 - Environ 260 serveurs Red Hat gérés (virtualisation 99%) :thumbsup:
 - Cinq salt-master (1x lab par sysadmin, 1x non prod, 1x prod)
-- Encore quelques serveurs legacy non gérables :bomb:
 - Un nouveau serveur virtuel RHEL7 complètement provisionné et intégré en moins de 12 minutes grâce à Salt Cloud et Rundeck [0]
 - Tout le code dans un dépôt Gitlab interne
 - Développement sur base d'un workflow collaboratif [1]
@@ -414,11 +225,6 @@ Et je ne gère alors que le strict minimum !
 `beacons` : fonctionnalité permettant de monitorer des processus hors Salt (charge système, RAM, fichier, nombre de sessions HAproxy, etc.) et envoyer des messages sur l'`event bus`  
 `reactors` : actions déclenchées en réaction à un évenement sur l'`event bus` 
 `mine` : fonction du master qui collecte des données très dynamiques générées par des minions pour les rendre disponibles auprès d'autres minions.
-`returners` : retourne l'"output" vers un système (stdout, DB, etc.)
-
-**Remarque**
-
-Curieusement dans la documentation et la configuration, SaltStack parle de `states` et `grains` (pluriel) mais de `pillar` (singulier).
 
 ---
 
@@ -568,6 +374,35 @@ Activation de SELinux :
 
 ![bg 70%](./img/bg.png)
 
+# top.sls pour les states
+
+On assigne des états de configurations à nos minions :
+
+```yaml
+[root@salt-master /]# cat /srv/salt/states/top.sls
+base:
+  '*':
+    - motd
+    
+  'G@os:RedHat':
+    - selinux
+
+  'G@ROLE:solr':
+    - solr
+```
+
+Appliquer le state `motd` sur tous les `minions`.
+
+Pour les OS de type `RedHat`, appliquer le state `selinux`.
+
+Pour les machines avec le ROLE custom `solr`, appliquer le state `solr`.
+
+Conseil : le top.sls doit être le plus **générique** possible. Ne pas cibler sur base du nom mais préférer le rôle.
+
+---
+
+![bg 70%](./img/bg.png)
+
 # Appliquer les configurations
 
 Appliquer les états de configuration définis dans `top.sls` : 
@@ -577,6 +412,34 @@ Appliquer les états de configuration définis dans `top.sls` :
 Tester sans appliquer en mode verbose :
 
 `salt 'cible' state.highstate -v test=True`
+
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Arborescence sur le master
+
+Selon notre configuration /etc/salt/master (file_roots, pillar_roots)
+
+```bash
+[root@salt-master /]# find /srv
+/srv
+/srv/salt
+/srv/salt/pillars
+/srv/salt/pillars/top.sls <------------- assigne des pillars aux minions
+/srv/salt/pillars/passwords
+/srv/salt/pillars/passwords/init.sls <-- un pillar
+/srv/salt/states
+/srv/salt/states/motd
+/srv/salt/states/motd/init.sls <-------- un state
+/srv/salt/states/motd/motd.jinja <------ un template de configuration
+/srv/salt/states/selinux
+/srv/salt/states/selinux/init.sls <----- un autre state
+/srv/salt/states/top.sls <-------------- assigne des states aux minions
+```
+
+
 
 ---
 
@@ -606,63 +469,7 @@ Et surtout :
 
 ![bg 70%](./img/bg.png)
 
-# Arborescence sur le master
-
-Selon notre configuration /etc/salt/master (file_roots, pillar_roots)
-
-```bash
-[root@salt-master /]# find /srv
-/srv
-/srv/salt
-/srv/salt/pillars
-/srv/salt/pillars/top.sls <------------- assigne des pillars aux minions
-/srv/salt/pillars/passwords
-/srv/salt/pillars/passwords/init.sls <-- un pillar
-/srv/salt/states
-/srv/salt/states/motd
-/srv/salt/states/motd/init.sls <-------- un state
-/srv/salt/states/motd/motd.jinja
-/srv/salt/states/selinux
-/srv/salt/states/selinux/init.sls <----- un autre state
-/srv/salt/states/top.sls <-------------- assigne des states aux minions
-```
-
----
-
-![bg 70%](./img/bg.png)
-
-# top.sls pour les states
-
-On assigne des states aux minions :
-
-```yaml
-[root@salt-master /]# cat /srv/salt/states/top.sls
-base:
-  '*':
-    - motd
-    
-  'G@os:RedHat':
-    - selinux
-
-  'G@ROLE:solr':
-    - solr
-```
-
-Appliquer le state `motd` sur tous les `minions`.
-
-Pour les OS de type `RedHat`, appliquer le state `selinux`.
-
-Pour les machines avec le ROLE custom `solr`, appliquer le state `solr`.
-
-Conseil : le top.sls doit être le plus **générique** possible. Ne pas cibler sur base du nom mais préférer le rôle.
-
----
-
-![bg 70%](./img/bg.png)
-
-# Notre premier state : `motd`
-
-MOTD : "message of the day", message affiché après login en session sur un serveur
+# Un premier état de configuration "state" : `motd`
 
 Notre état de configuration (fichier .sls, SaLt State) est écrit en YAML :
 
@@ -674,10 +481,6 @@ ma_conf_motd:                          <-- ID unique
     - source: salt://motd/motd.jinja   <-- template à utiliser
     - template: jinja                  <-- type de template
 ```
-
-`salt://` est un serveur HTTP embarqué dans Salt, on peut spécifier d'autres types de sources : `http://`, `https://`, `ftp://`, `file://`, etc.
-
-Par défaut jinja, plusieurs moteurs de templates supportés. But KISS !
 
 ---
 
@@ -798,8 +601,8 @@ postfix-service:
 
 postfix-conf:
   file.managed:
-    - name: /etc/postfix/master
-    - source: salt://postfix/master
+    - name: /etc/postfix/master.cf
+    - source: salt://postfix/master.cf.jinja
     - template: jinja
     - require:
       - pkg: postfix-pkg
@@ -809,14 +612,14 @@ postfix-conf:
 
 ![bg 70%](./img/bg.png)
 
-# Impératif ET déclaratif
+# Langage impératif ET déclaratif
 
 Impératif : 
 - Salt exécute les actions dans l'ordre de définition
 - plus simple à écrire mais moins fléxible
 
 Déclaratif : 
-- on défini les dépendances entre les actions
+- on défini les dépendances entre les actions (requisites)
 - modèle plus puissant et fléxible mais attention au spaghetti code
 
 [https://docs.saltstack.com/en/getstarted/flexibility.html](https://docs.saltstack.com/en/getstarted/flexibility.html)
@@ -1107,8 +910,6 @@ Events sur le bus sur requêtes webhooks : `salt/netapi/*`
 
 https://github.com/saltstack-formulas/salt-api-reactor-formula
 
-Attention : pas d'authentification sur webhooks, l'éventuelle sécurité doit être implémentée dans les reactors
-
 ---
 
 ![bg 70%](./img/bg.png)
@@ -1238,16 +1039,6 @@ A la création de la VM, salt-minion est installé et attaché automatiquement a
 
 ![bg 70%](./img/bg.png)
 
-<center><img src="./img/etnic.png"></center>
-
-<center><h1>L'ETNIC est régulièrement à la recherche de nouveaux talents !</h1></center>
-
-<center><h1><a href=https://monjob.etnic.be">https://monjob.etnic.be</a></center>
-
----
-
-![bg 70%](./img/bg.png)
-
 <center><h1>Questions ?</h1></center>
 
 ---
@@ -1256,4 +1047,4 @@ A la création de la VM, salt-minion est installé et attaché automatiquement a
 
 <center><img src="./img/qrcode.jpg" height="600"></center>
 
-<center><h1>Merci et à tout de suite ! </h1></center>
+<center><h1>Merci et à tout de suite !</h1></center>
