@@ -45,28 +45,14 @@ Contribution à plusieurs projets Open Source
 # Que permet Salt ?
 
 - exécution à distance asynchrone (sa fonction première au début du projet)
-- gestion de configuration centralisée
+- gestion de configuration centralisée (serveurs et devices divers)
+- provisioning "cloud"
 - récupération d'informations
-- provisioning VM et cloud
 - orchestration
 - monitoring
-- auto-scaling
+- auto-scalability
 - compliance
-- flexibilité et extensibilité
-
----
-
-![bg 70%](./img/bg.png)
-
-# Les avantages de la gestion de configuration :chart_with_upwards_trend: 
-
-- efficacité
-- stabilité
-- contrôle
-- suivi du changement
-- documentation
-- visibilité
-- compliance
+- extensible
 - ...
 
 ---
@@ -83,40 +69,17 @@ Contribution à plusieurs projets Open Source
 
 ---
 
-# Pourquoi Salt ?
-
 ![bg 70%](./img/bg.png)
 
-#### Premiers tests en mai 2013
-
-- gestion de configuration de services de base pour commencer (SSH, SMTP, NTP)
-- remote execution (`yum upgrade x`, `uptime`)
-- récupération d'informations sur le parc (CPU, mémoire, version OS)
-- code dans un dépôt SVN
-- test du code via `test=True` avant de pousser en production
-
----
-
-![bg 70%](./img/bg.png)
-
-# Les avantages (en 2013) (1/2)
+# Les avantages de Salt quand j'ai commencé
 
 - Orchestration "event-driven" via un `event bus` sur le master
 - Haute disponibilité du rôle `salt-master` possible
 - Ecrit en Python avec des possibilités d'extensions intéressantes
-- Configuration YAML et templates Jinja (mais attention à la syntaxe !)
-- `salt-syndic` pour les grosses infrastructures ("proxy")
+- Configuration YAML et templates Jinja (**attention à la syntaxe !**)
 - Mode masterless possible (code sur le serveur géré "minion")
-
----
-
-![bg 70%](./img/bg.png)
-
-# Les avantages (en 2013) (2/2)
-
 - Mode push ET pull
-- Début d'un support de Windows
-- Salt Cloud pour instancier le node avant de gérer sa configuration
+- Salt Cloud pour instancier le serveur avant de gérer sa configuration
 - Gestion de configuration, exécution à distance, récupération d'informations dans un seul package
 - Simple ! De l'installation à un premier fichier de configuration géré : 12 minutes
 - Communauté enthousiaste et dynamique
@@ -125,7 +88,7 @@ Contribution à plusieurs projets Open Source
 
 ![bg 70%](./img/bg.png)
 
-# Les inconvénients (en 2013) (1/2)
+# Les inconvénients (1/2)
 
 - Installation d'un agent (salt-minion) qui doit être dans la même version que le salt-master (alignement entre différents OS difficile)
 - Agent et ses dépendances (Python, ZeroMQ, msgpack) éparpillés dans les dépôts (RedHat, EPEL)
@@ -141,13 +104,13 @@ Contribution à plusieurs projets Open Source
 
 ![bg 70%](./img/bg.png)
 
-# Les inconvénients (en 2013) (2/2)
+# Les inconvénients (2/2)
 
 - Release cycle trop rapide et sans test
 
 ![40%](./img/regression.png)
 
-- Quelques gros bugs et failles de sécurité :
+- Quelques gros bugs, régressions et failles de sécurité :
   - `reload: True` qui fait un restart sur Redhat Entreprise Linux (RHEL)
   - ZeroMQ sous RHEL5 qui provoque la perte régulière des minions
   - faille critique dans la PKI
@@ -160,15 +123,15 @@ Contribution à plusieurs projets Open Source
 
 - SaltStack fourni des dépôts avec toutes les dépendances [0]
 - Ils ont engagé une équipe de testeurs : releases moins fréquentes, mieux testées, plus de régressions depuis longtemps
-- Le support de Windows et MacOS a bien avancé
-- Impératif ET déclaratif
-- Salt SSH pour gérer les "dumb" devices qui embarquent Python 2.6 ou plus
+- Support de Windows et MacOS
+- Langage impératif ET déclaratif [1]
+- Salt SSH pour gérer les "dumb" devices qui embarquent Python 2.6+
 - Salt Proxy pour gérer certains "super dumb" devices sans stack Python
-- Salt API fonctionne ! Intégrations possibles avec Jenkins, Rundeck, Satellite, etc.
-- Un web GUI dans la version enterprise
+- Salt API fonctionne ! Intégrations multiples possibles
 - Pas de support Python 3
 
 [0] [https://repo.saltstack.com](https://repo.saltstack.com)
+[1] [https://docs.saltstack.com/en/getstarted/flexibility.html](https://docs.saltstack.com/en/getstarted/flexibility.html)
 
 ---
 
@@ -177,24 +140,14 @@ Contribution à plusieurs projets Open Source
 # Salt à l'ETNIC aujourd'hui
 
 - Version actuelle Salt Community en release stable (2016.11)
-- Environ 260 serveurs Red Hat gérés (virtualisation 99%) :thumbsup:
+- Environ 260 serveurs gérés
 - Cinq salt-master (1x lab par sysadmin, 1x non prod, 1x prod)
-- Un nouveau serveur virtuel RHEL7 complètement provisionné et intégré en moins de 12 minutes grâce à Salt Cloud et Rundeck [0]
-- Tout le code dans un dépôt Gitlab interne
-- Développement sur base d'un workflow collaboratif [1]
+- Une nouvelle machine VMware RHEL7 complètement provisionnée et intégrée dans le parc en moins de 12 minutes grâce à Salt Cloud et Rundeck [0]
+- Tout le code dans un dépôt Git interne (Gitlab CE)
+- Développement sur base d'un workflow collaboratif par fork [1]
 
 [0] [http://www.rundeck.org](http://www.rundeck.org)
 [1] [https://www.atlassian.com/git/tutorials/comparing-workflows/](https://www.atlassian.com/git/tutorials/comparing-workflows/)
-
----
-
-# Workflow de développement
-
-![](./img/git-workflow.png)
-
----
-
-<center><img src="./img/under-control.jpg" width="700"></center>
 
 ---
 
@@ -207,9 +160,9 @@ Contribution à plusieurs projets Open Source
 `master` : serveur de gestion  
 `minion` : serveur géré  
 `event bus` : bus de communication pour les échanges entre master et minions
-`modules` : module d'exécution distante ayant différentes fonctions (ex : file.managed)
-`states` : déclaration de l'état d'un système (package installé, fichier configuré, service démarré, etc.)  
-`grains` : informations relativement statiques des minions  
+`modules` : module d'exécution distante ayant différentes fonctions (ex : pkg.install)
+`states` : états de configuration (package installé, fichier configuré, service démarré, etc.)  
+`grains` : informations "statiques" des minions  
 `pillar` : informations dynamiques stockées sur le master à disposition des minions  
 `top.sls` : les fichiers d'assignation de `states` et `pillars` aux minions  
 `init.sls` : manifest d'un `state`, `pillar` 
@@ -232,26 +185,39 @@ Contribution à plusieurs projets Open Source
 
 # Fonctionnement de base
 
-#### Mode client/server construit autour d'un `event bus`
+- Les minions sont connectés constamment au master via un "event bus"
+- Sur le master, deux ports écoutent et doivent être accessibles pour les minions
 
-<center><img src="./img/infra.png" height="500"></center>
+<center><img src="./img/infra.png" height="250"></center>
 
-Communication chiffrée AES
+- A la première connexion, le master doit accepter la clé d'un nouveau minion (PKI)
+- Le salt-master peut tourner en utilisateur non privilégié
+- Le salt-minion doit tourner en root
+- Fonctionne avec SELinux en mode `Enforcing` actif sur le master et ses minions
 
 ---
 
 ![bg 70%](./img/bg.png)
 
-# Fonctionnement de base
+# Recommandations avant d'écrire nos premiers states
 
-- Les minions sont connectés constamment au master (message bus ZeroMQ ou RAET)
-- Sur le master, deux ports écoutent et doivent être accessibles pour les minions :
-  - TCP/4505 : le bus de communication avec les minions
-  - TCP/4506 : pour les messages de retour des minions
-- A la première connexion, le master doit accepter la clé d'un nouveau minion (PKI)
-- Le salt-master peut tourner en utilisateur non privilégié
-- Le salt-minion doit tourner en root
-- Fonctionne avec SELinux en mode `Enforcing` actif sur le master et ses minions
+Infrastructure as Code [0] : un bug dans le code = un downtime éventuel
+
+Nous sommes à présent des sysadmins développeurs :
+
+- Définir des guidelines de développement (syntaxe, structure des fichiers, etc.)
+- Définir un workflow de développement (centralisé, par branche, par fork, etc.)
+- Utiliser un système de contrôle de versions (Git, etc.) 
+
+Ne rien pousser en production qui n'a pas été testé et validé (principe des 4 yeux)
+
+Et surtout :
+
+## KISS : Keep It Simple, Stupid
+
+> La perfection est atteinte, non pas lorsqu'il n'y a plus rien à  ajouter, mais lorsqu'il n'y a plus rien à  retirer. ~ Antoine de Saint-Exupéry
+
+[0] https://en.wikipedia.org/Infrastructure_as_Code
 
 ---
 
@@ -265,11 +231,11 @@ Communication chiffrée AES
 
 #### Sur le master :
 
-`yum install salt-master --enablerepo=saltstack`
+`yum install salt-master --enablerepo=salt-latest`
 
 #### Sur les minions :
 
-`yum install salt-minion --enablerepo=saltstack`
+`yum install salt-minion --enablerepo=salt-latest`
 
 
 ---
@@ -376,8 +342,6 @@ Activation de SELinux :
 
 # top.sls pour les states
 
-On assigne des états de configurations à nos minions :
-
 ```yaml
 [root@salt-master /]# cat /srv/salt/states/top.sls
 base:
@@ -387,91 +351,25 @@ base:
   'G@os:RedHat':
     - selinux
 
-  'G@ROLE:solr':
-    - solr
+  'G@ETNIC_ROLE:frontend':
+    - elastic
 ```
 
 Appliquer le state `motd` sur tous les `minions`.
 
 Pour les OS de type `RedHat`, appliquer le state `selinux`.
 
-Pour les machines avec le ROLE custom `solr`, appliquer le state `solr`.
+Pour les machines avec le grain ETNIC_ROLE `frontend`, appliquer le state `elastic`.
 
 Conseil : le top.sls doit être le plus **générique** possible. Ne pas cibler sur base du nom mais préférer le rôle.
 
----
 
-![bg 70%](./img/bg.png)
-
-# Appliquer les configurations
-
-Appliquer les états de configuration définis dans `top.sls` : 
-
-`salt 'cible' state.highstate`
-
-Tester sans appliquer en mode verbose :
-
-`salt 'cible' state.highstate -v test=True`
-
-
----
-
-![bg 70%](./img/bg.png)
-
-# Arborescence sur le master
-
-Selon notre configuration /etc/salt/master (file_roots, pillar_roots)
-
-```bash
-[root@salt-master /]# find /srv
-/srv
-/srv/salt
-/srv/salt/pillars
-/srv/salt/pillars/top.sls <------------- assigne des pillars aux minions
-/srv/salt/pillars/passwords
-/srv/salt/pillars/passwords/init.sls <-- un pillar
-/srv/salt/states
-/srv/salt/states/motd
-/srv/salt/states/motd/init.sls <-------- un state
-/srv/salt/states/motd/motd.jinja <------ un template de configuration
-/srv/salt/states/selinux
-/srv/salt/states/selinux/init.sls <----- un autre state
-/srv/salt/states/top.sls <-------------- assigne des states aux minions
-```
-
-
-
----
-
-![bg 70%](./img/bg.png)
-
-# Recommandations avant d'écrire nos premières lignes de code
-
-Infrastructure as Code [0] : un bug dans le code = un downtime éventuel
-
-Nous sommes à présent des sysadmins développeurs :
-
-- Définir des guidelines de développement (syntaxe, structure des fichiers, etc.)
-- Définir un workflow de développement (centralisé, par branche, par fork, etc.)
-- Utiliser un système de contrôle de versions (Git, etc.) 
-
-Ne rien pousser en production qui n'a pas été testé et validé (principe des 4 yeux)
-
-Et surtout :
-
-## KISS : Keep It Simple, Stupid
-
-> La perfection est atteinte, non pas lorsqu'il n'y a plus rien à  ajouter, mais lorsqu'il n'y a plus rien à  retirer. ~ Antoine de Saint-Exupéry
-
-[0] https://en.wikipedia.org/Infrastructure_as_Code
 
 ---
 
 ![bg 70%](./img/bg.png)
 
 # Un premier état de configuration "state" : `motd`
-
-Notre état de configuration (fichier .sls, SaLt State) est écrit en YAML :
 
 ```yaml
 [root@salt-master ~]# cat /srv/salt/states/motd/init.sls
@@ -481,6 +379,8 @@ ma_conf_motd:                          <-- ID unique
     - source: salt://motd/motd.jinja   <-- template à utiliser
     - template: jinja                  <-- type de template
 ```
+
+Syntaxe YAML, respecter les espaces !
 
 ---
 
@@ -496,14 +396,11 @@ Bonjour et bienvenue sur {{ grains['fqdn'] }}
 Mon master est {{ grains['master'] }}
 ```
 
-
 ---
 
 ![bg 70%](./img/bg.png)
 
 # Grains : informations concernant nos minions
-
-Pour lister les grains disponibles par défaut :
 
 ```yaml
 [root@salt-master ~]# salt 'salt-minion' grains.items
@@ -529,10 +426,28 @@ salt-minion:
 
 # Notre premier state : `motd`
 
-Appliquons la configuration avec `state.highstate` :
+Récapitulons :
+
+- assigner le rôle `motd` aux minions : `/srv/salt/states/top.sls`
+- écrire notre state : `/srv/salt/states/motd/init.sls`
+- créer un template : `/srv/salt/states/motd/motd.jinja`
+
+Pour tester avant d'appliquer
+
+`salt '*' state.highstate -v test=True`
+
+Pour appliquer :
+
+`salt '*' state.highstate`
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Notre premier state : `motd`
 
 ```bash
-[root@salt-master ~]# salt 'salt-minion' state.highstate
+[root@salt-master ~]# salt '*' state.highstate
 salt-minion:
 ----------
           ID: ma_conf_motd
@@ -558,10 +473,6 @@ Total states run:     2
 Total run time:  79.083 ms                                         79 ms !
 ```
 
-
-
-
-
 ---
 
 ![bg 70%](./img/bg.png)
@@ -580,14 +491,10 @@ Mon master est 10.211.55.26
 
 ![bg 70%](./img/bg.png)
 
-# Allons plus loin...
-
-Gestion d'un service et de sa configuration !
+# Un state plus avancé
 
 ```yaml
-postfix-pkg:
-  pkg.installed:
-    - name: postfix
+{% if grains['os'] == 'RedHat' and grains['osmajorelease'] >= '6' %}
 
 postfix-service:
   service.running:
@@ -595,7 +502,7 @@ postfix-service:
     - enable: True
     - reload: False
     - require:
-      - pkg: postfix-pkg
+      - file: postfix-conf
     - watch:
       - file: postfix-conf
 
@@ -604,25 +511,12 @@ postfix-conf:
     - name: /etc/postfix/master.cf
     - source: salt://postfix/master.cf.jinja
     - template: jinja
-    - require:
-      - pkg: postfix-pkg
+ 
+{% endif %}
 ```
 
----
+La logique peut aussi être appliquée dans les templates !
 
-![bg 70%](./img/bg.png)
-
-# Langage impératif ET déclaratif
-
-Impératif : 
-- Salt exécute les actions dans l'ordre de définition
-- plus simple à écrire mais moins fléxible
-
-Déclaratif : 
-- on défini les dépendances entre les actions (requisites)
-- modèle plus puissant et fléxible mais attention au spaghetti code
-
-[https://docs.saltstack.com/en/getstarted/flexibility.html](https://docs.saltstack.com/en/getstarted/flexibility.html)
 
 ---
 
@@ -632,8 +526,9 @@ Déclaratif :
 
 Les modules se chargent de "deviner" les utilitaires à utiliser.
 
-`pkg.installed` utilisera le gestionnaire de package du système : `yum`, `apt`, `zypper`, etc.
-`service.running` démarre le service via ce qu'il trouve parmi `sysVinit`, `systemd`, `upstart`, etc.
+`pkg.installed` devinera le gestionnaire de package du système
+
+`service.running` démarre le service via ce qu'il trouve comme système init
 
 # Oui mais...
 
@@ -647,40 +542,22 @@ Exemple : https://github.com/saltstack-formulas/vim-formula/blob/master/vim/map.
 
 ![bg 70%](./img/bg.png)
 
-# Un template plus avancé
-
-```jinja
-{% if grains['os'] == 'RedHat' and grains['osmajorelease'] == '5' %}
-...
-{% elif grains['os'] == 'RedHat' and grains['osmajorelease'] >= '6' %}
-...
-{% elif grains['os'] == 'Debian' %}
-...
-{% else %}
-...
-{% endif %}
-```
-
----
-
-![bg 70%](./img/bg.png)
-
 # Définir un nouveau grain manuellement
 
 ```bash
-master# salt 'salt-minion' grains.setval ROLE ['solr','elastic']
+master# salt 'salt-minion' grains.setval ROLE ['frontend','elastic']
 salt-minion:
     ----------
     ROLE:
-        - solr
+        - frontend
         - elastic
 ```
 
-On peut alors avoir un template tel que :
+On peut alors avoir un state tel que :
 
 ```jinja
 {% if grains['ROLE'] is defined %}
-{% if 'solr' in grains['ROLE'] %}
+{% if 'frontend' in grains['ROLE'] %}
 ...
 {% endif %}
 {% endif %}
@@ -699,9 +576,9 @@ role-{{ i }}-conf:
 
 # Définir un nouveau grain automatiquement
 
-Il est possible de récupérer des informations provenant de différentes sources (CMDB, LDAP, DB, API, etc.) et de les stocker dans des grains sur nos minions.
+Il est possible d'alimenter des nouveaux grains avec informations provenant de différentes sources (CMDB, LDAP, DB, API, etc.).
 
-Mise à jour des grains au runtime ou via la commande `saltutil.sync_grains`
+Mise à jour au démarrage du minion ou via la commande master `saltutil.sync_grains`
 
 Ce script Python sera placé sous `/srv/salt/states/_grains/satellite.py`
 
@@ -743,8 +620,6 @@ mysql-bob:
     - password: eponge
 ```
 
-Pour des raisons de performances, chaque `state` est mis en cache sur le minion à l'exécution de la commande `state.highstate`
-
 Ce fichier sera mis en cache sur les minions sous `/var/cache/salt/minions/files/base/mysql/init.sls`
 
 #### ==> Problème potentiel de sécurité
@@ -759,6 +634,14 @@ Par contre, les pillars ne sont jamais conservés en cache !
 
 Alternative avec utilisation d'un pillar :
 
+/srv/salt/pillars/top.sls
+
+```yaml
+base:
+  'salt-minion':
+     - mysql
+```
+
 /srv/salt/pillars/mysql/init.sls
 ```
 mysql:
@@ -770,7 +653,7 @@ mysql:
 bob:
   mysql_user.present:
     - host: localhost
-    - password: {{ salt['pillar.get']('mysql:bob:password'), 'defaut' }}
+    - password: {{ salt['pillar.get']('mysql:bob:password'), None }}
 ```
 
 ---
@@ -785,24 +668,6 @@ Rappels :
 - Ils ne sont **jamais** stockés sur les minions
 - A chaque appel d'un pillar, un canal de communication dédié et crypté est établi entre le master et le minion
 - Problème de performance potentiel si beaucoup trop de pillars (pas dans la doc !)
-
----
-
-![bg 70%](./img/bg.png)
-
-# Différentes syntaxes pour faire la même chose ?
-
-#### Grains
-
-`{{ grains['ROLE'] }}`
-`{{ salt['grains.get']('ROLE', None) }}`
-
-#### Pillars
-
-`{{ pillar['PWD'] }}`
-`{{ salt['pillar.get']('PWD', None) }}`
-
-Privilégier la méthode `salt['module.function']` plus avancée et permettant de définir des valeurs par défaut si la variable recherchée n'existe pas.
 
 ---
 
@@ -830,8 +695,6 @@ salt/minion/jdl-minion1/start	{
     "tag": "salt/minion/jdl-minion1/start"
 }
 ```
-
-**Astuce :** pour monitorer l'état d'avancement d'un highstate sur le bus, activer `state_events: True` dans la configuration du master.
 
 ---
 
@@ -872,14 +735,14 @@ hipchat:
 
 # Salt API
 
-Installation : `yum install salt-api --enablerepo=saltstack`
+Installation : `yum install salt-api --enablerepo=salt-latest`
 
 Configuration /etc/salt/master.d/api.conf
 
 ```
 external_auth:
   pam:
-    testapi:
+    testapiaccount:
       - .*
       - '@wheel'  
       - '@runner' 
@@ -914,21 +777,12 @@ https://github.com/saltstack-formulas/salt-api-reactor-formula
 
 ![bg 70%](./img/bg.png)
 
-# Les runners
-
-`state.highstate` s'exécute de manière concurrentielle sur les minions.
-
-Le runner `state.orchestrate` s'exécute sur le master et permet d'appliquer les états de manière orchestrée dans un ordre défini et coordonné, par exemple : 
-
-- installer la base de données sur le serveur ayant le rôle `mysql`
-- installer le serveur applicatif sur les serveurs `backend` 
-- reconfigurer le reverse proxy `frontend`
-
----
-
-![bg 70%](./img/bg.png)
-
 # Interfaçage REST
+
+#### Salt fourni donc un service REST
+
+Exemple : 
+- déclencher une action Salt après exécution d'un job Jenkins (ex : déploiement d'une application)
 
 #### Salt peut consommer des services REST
 
@@ -939,11 +793,6 @@ On peut donc imaginer une fonctionnalité webhook avec un reactor.
 Exemples :
 - ouverture automatique d'un ticket lors d'un événement sur le bus
 - déclencher un job Jenkins dès l'apparition d'un nouveau minion
-
-#### Salt fourni un service REST
-
-Exemple : 
-- déclencher une action Salt après exécution d'un job Jenkins (déploiement d'un nouvel artefact)
 
 ---
 
@@ -1032,6 +881,8 @@ A la création de la VM, salt-minion est installé et attaché automatiquement a
 ![bg 70%](./img/bg.png)
 
 # Démonstration !
+
+### Installation et configuration master et minion
 
 ### Exécution distante
 
