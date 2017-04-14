@@ -312,6 +312,75 @@ Use custom-grain in motd
 {{ grains['zzz_custom']['custom-grain'] }}
 ```
 
+## Salt API
+
+Create local account `testapi` + pwd
+
+Set up API
+
+```
+external_auth:
+  pam:
+    testapi:
+      - .*
+      - '@wheel'  
+      - '@runner' 
+      - '@jobs'
+
+rest_cherrypy:
+  port: 8080
+  host: 0.0.0.0
+  disable_ssl: True
+  webhook_url: /hook
+  webhook_disable_auth: True
+```
+
+`systemctl restart salt-master` (for auth) and `salt-api -l debug`
+
+Start Postman and send 
+
+#### runner
+
+http://10.1.1.17:8080/run
+
+headers:
+
+- Accept: application/x-yaml
+- Content-Type: application/x-www-form-urlencoded
+
+`body: client=local&tgt=*&fun=test.ping&username=testapi&password=xxx&eauth=pam`
+
+- test.ping (runner)
+- state.highstate (runner)
+
+(no API event on the bus for runners)
+
+#### webhook
+
+http://10.1.1.17:8080/hook/test/jdl
+
+No headers, no auth
+
+Create reactor:
+
+/etc/salt/master
+
+```
+reactor:
+  - 'salt/netapi/hook/test/jdl':
+    - /srv/salt/reactors/api-hook-jdl.sls
+```
+
+/srv/salt/reactors/api-hook-jdl.sls
+
+```
+command_run:
+  cmd.cmd.run:
+    - tgt: jdl-minion
+    - arg:
+      - "touch /tmp/api-works.txt"
+```
+
 ## Salt Cloud deployments
 
 - screenshots

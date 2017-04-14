@@ -1067,31 +1067,45 @@ hipchat:
 
 # Salt API
 
-Configuration /etc/salt/master
+`yum install salt-api`
+
+Configuration /etc/salt/master.d/api.conf
 
 ```
+external_auth:
+  pam:
+    testapi:
+      - .*
+      - '@wheel'  
+      - '@runner' 
+      - '@jobs'
+
 rest_cherrypy:
   port: 8080
   host: 0.0.0.0
   disable_ssl: False
   ssl_crt: /etc/ssl/private/cert.pem
   ssl_key: /etc/ssl/private/key.pem
-  webhook_disable_auth: True
   webhook_url: /hook
+  webhook_disable_auth: True
   debug: False
 ```
 
-Démarrer : `systemctl start salt-api`
+Redémarrer le master : `systemctl restart salt-master` (pour la partie auth)
+
+Démarrer Salt API : `systemctl start salt-api`
 
 ---
 
 ![bg 70%](./img/bg.png)
 
-# Reactors sur appels API
+# Reactors sur webhooks API
 
-Events sur le bus : `salt/netapi/*`
+Events sur le bus sur requêtes webhooks : `salt/netapi/*`
 
 https://github.com/saltstack-formulas/salt-api-reactor-formula
+
+Attention : pas d'authentification sur webhooks, l'éventuelle sécurité doit être implémentée dans les reactors
 
 ---
 
