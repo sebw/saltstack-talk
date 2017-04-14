@@ -617,7 +617,7 @@ mysql-bob:
   mysql_user.present:
     - name: bob
     - host: localhost
-    - password: eponge
+    - password: hunter2
 ```
 
 Ce fichier sera mis en cache sur les minions sous `/var/cache/salt/minions/files/base/mysql/init.sls`
@@ -646,7 +646,7 @@ base:
 ```
 mysql:
   bob:
-    password: eponge
+    password: hunter2
 ```
 /srv/salt/states/mysql/init.sls
 ```
