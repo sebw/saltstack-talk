@@ -610,7 +610,7 @@ def satellite_retrieve_info():
 
 Imaginons un state `mysql` :
 
-```jinja
+```
 mysql-bob:
   mysql_user.present:
     - name: bob
@@ -641,15 +641,19 @@ base:
 ```
 
 /srv/salt/pillars/mysql/init.sls
-```
+
+```yaml
 mysql:
   bob:
     password: hunter2
 ```
+
 /srv/salt/states/mysql/init.sls
-```
-bob:
+
+```yaml
+mysql-bob:
   mysql_user.present:
+    - name: bob
     - host: localhost
     - password: {{ salt['pillar.get']('mysql:bob:password'), None }}
 ```
@@ -673,7 +677,7 @@ Rappels :
 
 # Que se passe-t'il sur l'event bus ?
 
-`salt-run state.event pretty=True` montre les events sur le master :
+Sur le master `salt-run state.event pretty=True`
 
 ```
 minion_start	{
@@ -700,7 +704,7 @@ salt/minion/jdl-minion1/start	{
 
 # Les reactors
 
-Réactions à des events sur le bus, configurés sur le master dans `/etc/salt/master` :
+Réactions à des events sur le bus, configurés sur le master `/etc/salt/master` :
 
 ```yaml
 reactor:
@@ -782,7 +786,7 @@ https://github.com/saltstack-formulas/salt-api-reactor-formula
 Possibilités : 
 
 - développer une interface web de gestion pour Salt
-- déclencher une action Salt après exécution d'un job Jenkins (ex : déploiement d'une application)
+- un job Jenkins déclenche une action Salt (ex : déploiement d'une application une fois compilée)
 
 #### Salt peut consommer des services REST
 
@@ -790,9 +794,8 @@ Possibilités :
 
 Possibilité : event sur le bus --> reactor --> requête vers une API
 
-Exemples :
+Exemple :
 - ouverture automatique d'un ticket lors d'un événement sur le bus (beacons !)
-- déclencher un job Jenkins dès l'apparition d'un nouveau minion
 
 ---
 
