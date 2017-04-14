@@ -4,21 +4,29 @@
 
 Disable flux
 
+Enable caffeine
+
 Disable any source of notification (chat, browsers, etc.)
 
-Deploy 3 VM :
+Deploy 3 VM and write down their IP:
 
-- jdl-master
-- jdl-minion1
-- jdl-minion2
+- master01: 10.1.1.____
+- minion01: 10.1.1.____
+- minion02: 10.1.1.____
 
-Get their IP
+**Edit /etc/hosts on each**
 
-Edit /etc/hosts on each
+**Disable firewall on master: systemctl stop firewalld**
 
 ## Getting started
 
+- master and minions
+
+`yum install https://repo.saltstack.com/yum/redhat/salt-repo-latest-1.el7.noarch.rpm`
+
 - install salt-master RHEL + config
+
+`yum -y install salt-master`
 
 /etc/salt/master
 
@@ -34,17 +42,18 @@ pillar_roots:
 
 - install salt-minion RHEL + config
 
+`yum -y install salt-minion`
+
 /etc/salt/minion
 
 ```
 master: jdl-master
 ```
 
-- systemctl stop firewalld on master
-- accept salt-minion keys : salt-key -a jdl-minion*
-- test.ping
-- grains.items
-- targetting based on grain: salt -G 'os:CentOS' test.ping
+- accept salt-minion keys : `salt-key -a jdl-minion*`
+- `salt '*' test.ping`
+- `salt '*' grains.items`
+- targetting based on grain: `salt -G 'os:CentOS' test.ping`
 
 ## Remote execution
 
@@ -52,9 +61,15 @@ master: jdl-master
 
 	- cmd.run
 	- iptables.version
-	- selinux.getenforce (will show something is missing, install pkg in next step)	- pkg.install policycoreutils-python
+	- selinux.getenforce (will show something is missing, install pkg in next step)
+	- salt 'minion01' pkg.install policycoreutils-python
+	- selinux.getenforce again
 	
 ## Configuration Management
+
+- Create states and pillars directories
+
+`mkdir -p /srv/salt/{states,pillars}`
 
 - manage /etc/motd
 
@@ -307,9 +322,9 @@ Show minion logs
 [DEBUG   ] "GET / HTTP/1.1" 200 34
 ```
 
-salt 'jdl-minion' grains.item zzz_custom
+`salt 'jdl-minion' grains.item zzz_custom`
 
-Use custom-grain in motd
+Use custom-grain in motd.jinja
 
 ```
 {{ grains['zzz_custom']['custom-grain'] }}
@@ -346,7 +361,7 @@ Start Postman and send
 
 #### runner
 
-http://10.1.1.17:8080/run
+URL: `http://master01:8080/run`
 
 headers:
 
@@ -362,7 +377,7 @@ headers:
 
 #### webhook
 
-http://10.1.1.17:8080/hook/test/jdl
+URL: `http://master01:8080/hook/test/jdl`
 
 No headers, no auth
 
@@ -385,17 +400,3 @@ command_run:
     - arg:
       - "touch /tmp/api-works.txt"
 ```
-
-
-
-## Advanced use (if time allows)
-
-### Salt Cloud deployments
-
-- screenshots
-- website docs
-- show etnic setup
-
-### Mine
-
-- mine
