@@ -49,6 +49,7 @@ master: jdl-master
 ## Remote execution
 
 - remote execution
+
 	- cmd.run
 	- iptables.version
 	- selinux.getenforce (will show something is missing, install pkg in next step)	- pkg.install policycoreutils-python
@@ -273,6 +274,8 @@ salt/beacon/jdl-minion/inotify//etc/passwd	{
 	
 ## Extending Salt
 
+
+
 - custom grain from API (httpd)
 
 /var/www/html/index.html
@@ -313,6 +316,8 @@ Use custom-grain in motd
 ```
 
 ## Salt API
+
+`yum install salt-api`
 
 Create local account `testapi` + pwd
 
@@ -381,12 +386,16 @@ command_run:
       - "touch /tmp/api-works.txt"
 ```
 
-## Salt Cloud deployments
+
+
+## Advanced use (if time allows)
+
+### Salt Cloud deployments
 
 - screenshots
 - website docs
 - show etnic setup
 
-## Advanced use (if time allows)
+### Mine
 
 - mine

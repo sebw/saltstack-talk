@@ -81,7 +81,7 @@ Plus de 200 employés (opérations, exploitation, développement)
 - efficacité
 - stabilité
 - contrôle
-- suivi
+- suivi du changement
 - documentation
 - visibilité
 - compliance
@@ -608,6 +608,8 @@ Et surtout :
 
 # Arborescence sur le master
 
+Selon notre configuration /etc/salt/master (file_roots, pillar_roots)
+
 ```bash
 [root@salt-master /]# find /srv
 /srv
@@ -1067,7 +1069,7 @@ hipchat:
 
 # Salt API
 
-`yum install salt-api`
+Installation : `yum install salt-api --enablerepo=saltstack`
 
 Configuration /etc/salt/master.d/api.conf
 
@@ -1081,7 +1083,7 @@ external_auth:
       - '@jobs'
 
 rest_cherrypy:
-  port: 8080
+  port: 8443
   host: 0.0.0.0
   disable_ssl: False
   ssl_crt: /etc/ssl/private/cert.pem
@@ -1093,7 +1095,7 @@ rest_cherrypy:
 
 Redémarrer le master : `systemctl restart salt-master` (pour la partie auth)
 
-Démarrer Salt API : `systemctl start salt-api`
+Démarrer Salt API : `systemctl start salt-api` ou `salt-api -l debug`
 
 ---
 
