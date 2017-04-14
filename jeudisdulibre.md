@@ -1033,7 +1033,21 @@ A la création de la VM, salt-minion est installé et attaché automatiquement a
 
 # Démonstration !
 
-#### La production des Jeudis du Libre tient à rassurer le spectateur qu'aucun minion ne sera maltraité durant cette présentation.
+### Exécution distante
+
+### Gestion de configuration
+
+### Grains
+
+### Pillars
+
+### Reactors
+
+### Beacons
+
+### Récupération de grains via une API
+
+### Salt API
 
 ---
 
