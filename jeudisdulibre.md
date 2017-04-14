@@ -185,12 +185,12 @@ Contribution à plusieurs projets Open Source
 
 # Fonctionnement de base
 
-- Les minions sont connectés constamment au master via un "event bus"
+- Les minions sont connectés constamment au master
 - Sur le master, deux ports écoutent et doivent être accessibles pour les minions
 
 <center><img src="./img/infra.png" height="250"></center>
 
-- A la première connexion, le master doit accepter la clé d'un nouveau minion (PKI)
+- A la première connexion d'un minion, le master doit accepter sa clé
 - Le salt-master peut tourner en utilisateur non privilégié
 - Le salt-minion doit tourner en root
 - Fonctionne avec SELinux en mode `Enforcing` actif sur le master et ses minions
@@ -205,17 +205,15 @@ Infrastructure as Code [0] : un bug dans le code = un downtime éventuel
 
 Nous sommes à présent des sysadmins développeurs :
 
-- Définir des guidelines de développement (syntaxe, structure des fichiers, etc.)
+- Définir des guidelines de développement (syntaxe, structure, etc.)
 - Définir un workflow de développement (centralisé, par branche, par fork, etc.)
-- Utiliser un système de contrôle de versions (Git, etc.) 
+- Stocker le code dans un outil de gestion de versions (Git, etc.) 
 
 Ne rien pousser en production qui n'a pas été testé et validé (principe des 4 yeux)
 
-Et surtout :
+Principe KISS : Keep It Simple, Stupid
 
-## KISS : Keep It Simple, Stupid
-
-> La perfection est atteinte, non pas lorsqu'il n'y a plus rien à  ajouter, mais lorsqu'il n'y a plus rien à  retirer. ~ Antoine de Saint-Exupéry
+> La perfection est atteinte, non pas lorsqu'il n'y a plus rien à ajouter, mais lorsqu'il n'y a plus rien à retirer. ~ Antoine de Saint-Exupéry
 
 [0] https://en.wikipedia.org/Infrastructure_as_Code
 
@@ -526,7 +524,7 @@ La logique peut aussi être appliquée dans les templates !
 
 Les modules se chargent de "deviner" les utilitaires à utiliser.
 
-`pkg.installed` devinera le gestionnaire de package du système
+`pkg.installed` utilise le gestionnaire de package du système
 
 `service.running` démarre le service via ce qu'il trouve comme système init
 
@@ -576,7 +574,7 @@ role-{{ i }}-conf:
 
 # Définir un nouveau grain automatiquement
 
-Il est possible d'alimenter des nouveaux grains avec informations provenant de différentes sources (CMDB, LDAP, DB, API, etc.).
+Alimenter des nouveaux grains avec des informations provenant de différentes sources externes : CMDB, LDAP, DB, API, etc.
 
 Mise à jour au démarrage du minion ou via la commande master `saltutil.sync_grains`
 
@@ -781,17 +779,19 @@ https://github.com/saltstack-formulas/salt-api-reactor-formula
 
 #### Salt fourni donc un service REST
 
-Exemple : 
+Possibilités : 
+
+- développer une interface web de gestion pour Salt
 - déclencher une action Salt après exécution d'un job Jenkins (ex : déploiement d'une application)
 
 #### Salt peut consommer des services REST
 
 `salt-run http.query https://jenkins.example.org/ params='{"job": "true"}'`
 
-On peut donc imaginer une fonctionnalité webhook avec un reactor.
+Possibilité : event sur le bus --> reactor --> requête vers une API
 
 Exemples :
-- ouverture automatique d'un ticket lors d'un événement sur le bus
+- ouverture automatique d'un ticket lors d'un événement sur le bus (beacons !)
 - déclencher un job Jenkins dès l'apparition d'un nouveau minion
 
 ---
@@ -847,11 +847,9 @@ vmware-centos7.3:
     disk:
       Hard disk 2:
         size: 20
-        controller: SCSI controller 2
     network:
       Network adapter 1:
         name: VLAN30
-        switch_type: standard
         ip: 10.20.30.123
         gateway: [10.20.30.110]
         subnet_mask: 255.255.255.128
@@ -896,7 +894,7 @@ A la création de la VM, salt-minion est installé et attaché automatiquement a
 
 ### Beacons
 
-### Récupération de grains via une API
+### Création de grains avec infos depuis une API
 
 ### Salt API
 
