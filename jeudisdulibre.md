@@ -28,15 +28,15 @@ _20/04/2017_
 
 # Qui suis-je ?
 
-Administrateur systèmes chez ETNIC
+Administrateur systèmes Linux chez ETNIC
 
-Gradué de l'Institut Supérieur Economique (ISE) de Mons en... comptabilité et gestion
+Gradué en comptabilité et gestion (Institut Supérieur Economique de Mons) 
 
 Blogger [https://blog.wains.be](https://blog.wains.be)
 
 Red Hat Certified Engineer
 
-Contribution à plusieurs projets Open Source
+Contributeur Open Source
 
 ---
 
@@ -44,9 +44,9 @@ Contribution à plusieurs projets Open Source
 
 # Que permet Salt ?
 
-- exécution à distance asynchrone (sa fonction première au début du projet)
-- gestion de configuration centralisée (serveurs et devices divers)
+- gestion de configuration (serveurs et devices divers)
 - provisioning "cloud"
+- exécution à distance asynchrone (sa fonction première au début du projet)
 - récupération d'informations
 - orchestration
 - monitoring
@@ -59,76 +59,31 @@ Contribution à plusieurs projets Open Source
 
 ![bg 70%](./img/bg.png)
 
-<h1><p style="text-align: center;">Combien de serveurs pour commencer ?</p>
+# Ce qui m'a séduit par rapport à la concurrence
 
----
-
-![bg 70%](./img/bg.png)
-
-<center><img src="./img/1.ico"></center>
-
----
-
-![bg 70%](./img/bg.png)
-
-# Les avantages de Salt quand j'ai commencé
-
-- Orchestration "event-driven" via un `event bus` sur le master
-- Haute disponibilité du rôle `salt-master` possible
-- Ecrit en Python avec des possibilités d'extensions intéressantes
-- Configuration YAML et templates Jinja (**attention à la syntaxe !**)
-- Mode masterless possible (code sur le serveur géré "minion")
-- Mode push ET pull
+- Orchestration "event-driven" via un bus d'événement `bus event`
+- Haute disponibilité du serveur maître `salt-master`
+- Ecrit en Python et développement de "plugins" facile
+- Configuration YAML et templating Jinja
+- Mode master/slave ou masterless
+- Gestion de configuraiton en mode push et/ou pull
 - Salt Cloud pour instancier le serveur avant de gérer sa configuration
+- Salt API pour intégrer avec d'autres outils
 - Gestion de configuration, exécution à distance, récupération d'informations dans un seul package
-- Simple ! De l'installation à un premier fichier de configuration géré : 12 minutes
+- Simple !
 - Communauté enthousiaste et dynamique
 
 ---
 
 ![bg 70%](./img/bg.png)
 
-# Les inconvénients (1/2)
+# Ce qui m'a séduit par rapport à la concurrence
 
-- Installation d'un agent (salt-minion) qui doit être dans la même version que le salt-master (alignement entre différents OS difficile)
-- Agent et ses dépendances (Python, ZeroMQ, msgpack) éparpillés dans les dépôts (RedHat, EPEL)
-- Language déclaratif (ordre d'exécution aléatoire si pas de dépendances définies entre actions)
-- Communauté **trop** enthousiaste...
-- ... qui donne l'impression de partir un peu dans tous les sens : 
-  - tout est en chantier, rien n'est abouti
-  - installation de Salt API impossible 
-  - pas de support VMware dans Salt Cloud
-  - pull requests acceptés 5 minutes montre en main
-
----
-
-![bg 70%](./img/bg.png)
-
-# Les inconvénients (2/2)
-
-- Release cycle trop rapide et sans test
-
-![40%](./img/regression.png)
-
-- Quelques gros bugs, régressions et failles de sécurité :
-  - `reload: True` qui fait un restart sur Redhat Entreprise Linux (RHEL)
-  - ZeroMQ sous RHEL5 qui provoque la perte régulière des minions
-  - faille critique dans la PKI
-
----
-
-![bg 70%](./img/bg.png)
-
-# Salt aujourd'hui
-
-- SaltStack fourni des dépôts avec toutes les dépendances [0]
-- Ils ont engagé une équipe de testeurs : releases moins fréquentes, mieux testées, plus de régressions depuis longtemps
+- SaltStack fourni des dépôts pour toutes les plateformes habituelles [0]
 - Support de Windows et MacOS
 - Langage impératif ET déclaratif [1]
 - Salt SSH pour gérer les "dumb" devices qui embarquent Python 2.6+
 - Salt Proxy pour gérer certains "super dumb" devices sans stack Python
-- Salt API fonctionne ! Intégrations multiples possibles
-- Pas de support Python 3
 
 [0] [https://repo.saltstack.com](https://repo.saltstack.com)
 [1] [https://docs.saltstack.com/en/getstarted/flexibility.html](https://docs.saltstack.com/en/getstarted/flexibility.html)
@@ -139,15 +94,17 @@ Contribution à plusieurs projets Open Source
 
 # Salt à l'ETNIC aujourd'hui
 
-- Version actuelle Salt Community en release stable (2016.11)
-- Environ 260 serveurs gérés
-- Cinq salt-master (1x lab par sysadmin, 1x non prod, 1x prod)
-- Une nouvelle machine VMware RHEL7 complètement provisionnée et intégrée dans le parc en moins de 12 minutes grâce à Salt Cloud et Rundeck [0]
-- Tout le code dans un dépôt Git interne (Gitlab CE)
-- Développement sur base d'un workflow collaboratif par fork [1]
+- Dernière version Salt Community stable
+- 5 serveurs maître (1x lab par sysadmin, 1x non prod, 1x prod)
+- 260 serveurs gérés
+- 12 minutes pour déployer et intégrer une VM RHEL7 sur VMware avec Salt Cloud et Rundeck
+- Intégrations avec RedHat Satellite, Rundeck [0], iTop [1], Jenkins, Mattermost
+- Code dans un dépôt Gitlab interne
+- Développement sur base d'un workflow collaboratif par fork [2]
 
 [0] [http://www.rundeck.org](http://www.rundeck.org)
-[1] [https://www.atlassian.com/git/tutorials/comparing-workflows/](https://www.atlassian.com/git/tutorials/comparing-workflows/)
+[1] [https://www.combodo.com/itop](https://www.combodo.com/itop)
+[2] [https://www.atlassian.com/git/tutorials/comparing-workflows/](https://www.atlassian.com/git/tutorials/comparing-workflows/)
 
 ---
 
@@ -157,12 +114,12 @@ Contribution à plusieurs projets Open Source
 
 #### Glossaire
 
-`master` : serveur de gestion  
-`minion` : serveur géré  
+`master` : serveur maître  
+`minion` : les agents contrôlés par le master 
 `event bus` : bus de communication pour les échanges entre master et minions
 `modules` : module d'exécution distante ayant différentes fonctions (ex : pkg.install)
 `states` : états de configuration (package installé, fichier configuré, service démarré, etc.)  
-`grains` : informations "statiques" des minions  
+`grains` : informations "statiques" des minions à disposition du master 
 `pillar` : informations dynamiques stockées sur le master à disposition des minions  
 `top.sls` : les fichiers d'assignation de `states` et `pillars` aux minions  
 `init.sls` : manifest d'un `state`, `pillar` 
@@ -175,9 +132,9 @@ Contribution à plusieurs projets Open Source
 
 #### Glossaire
 
-`beacons` : fonctionnalité permettant de monitorer des processus hors Salt (charge système, RAM, fichier, nombre de sessions HAproxy, etc.) et envoyer des messages sur l'`event bus`  
-`reactors` : actions déclenchées en réaction à un évenement sur l'`event bus` 
-`mine` : fonction du master qui collecte des données très dynamiques générées par des minions pour les rendre disponibles auprès d'autres minions.
+`beacons` : monitoring de processus hors Salt (charge système, modification fichiers, etc.) et envoi d'événement sur l'`event bus`  
+`reactors` : actions déclenchées en réaction à un événement sur l'`event bus` 
+`mine` : endroit sur le master où les minions poussent des informations à disposition des autres minions
 
 ---
 
@@ -321,7 +278,7 @@ Voir `/usr/lib/python2.7/site-packages/salt/modules/test.py` sur le minion.
 
 ![bg 70%](./img/bg.png)
 
-# Un autre exemple d'exécution distante
+# D'autres exempels d'exécution distante
 
 `salt 'cible' module.fonction [arguments] [options salt]`
 
@@ -332,6 +289,13 @@ Activation de SELinux :
 {
     "salt-minion": "Enforcing"
 }
+```
+
+Utilisation disque :
+
+```bash
+# salt 'salt-minion' disk.percent / --output=txt
+salt-minion: 19%
 ```
 
 ---
@@ -355,11 +319,12 @@ base:
 
 Appliquer le state `motd` sur tous les `minions`.
 
-Pour les OS de type `RedHat`, appliquer le state `selinux`.
+Pour les minions dont le grain :
 
-Pour les machines avec le grain ETNIC_ROLE `frontend`, appliquer le state `elastic`.
+- "os" est `RedHat`, appliquer le state `selinux`.
+- "ETNIC_ROLE" est `frontend`, appliquer le state `elastic`.
 
-Conseil : le top.sls doit être le plus **générique** possible. Ne pas cibler sur base du nom mais préférer le rôle.
+**Conseil :** cibler par rôle et pas par nom.
 
 
 
@@ -378,7 +343,7 @@ ma_conf_motd:                          <-- ID unique
     - template: jinja                  <-- type de template
 ```
 
-Syntaxe YAML, respecter les espaces !
+**Attention :** syntaxe YAML, respecter les espaces !
 
 ---
 
@@ -426,7 +391,7 @@ salt-minion:
 
 Récapitulons :
 
-- assigner le rôle `motd` aux minions : `/srv/salt/states/top.sls`
+- assigner le state `motd` aux minions : `/srv/salt/states/top.sls`
 - écrire notre state : `/srv/salt/states/motd/init.sls`
 - créer un template : `/srv/salt/states/motd/motd.jinja`
 

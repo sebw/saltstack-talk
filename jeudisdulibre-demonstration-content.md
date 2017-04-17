@@ -105,6 +105,10 @@ jdl-minion:
         - motd
 ```
 
+`salt '*' state.highstate -v test=True`
+
+`salt '*' state.highstate`
+
 - reminder: `grains.items` and `grains.item grain_name`
 - jinja template: use `os` or `mem_total` grains
 - declare custom grain with multiple values `salt 'jdl-minion' grains.setval ROLE ['solr','apache']`
@@ -365,7 +369,6 @@ URL: `http://master01:8080/run`
 
 headers:
 
-- Accept: application/x-yaml
 - Content-Type: application/x-www-form-urlencoded
 
 `body: client=local&tgt=*&fun=test.ping&username=testapi&password=xxx&eauth=pam`
