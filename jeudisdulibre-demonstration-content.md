@@ -10,9 +10,11 @@ Disable any source of notification (chat, browsers, etc.)
 
 Deploy 3 VM and write down their IP:
 
-- master01: 10.1.1.____
-- minion01: 10.1.1.____
-- minion02: 10.1.1.____
+- master01 (prompt rouge) : 10.1.1.____
+- minion01 (prompt bleu): 10.1.1.____
+- minion02 (prompt vert): 10.1.1.____
+
+Colorize: https://www.kirsle.net/wizards/ps1.html
 
 **Edit /etc/hosts on each**
 
