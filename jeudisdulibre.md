@@ -1,4 +1,4 @@
-<!-- $width: 1300 -->
+<!-- $width: 1500 -->
 <!-- $height: 1000 -->
 <!-- *page_number: false -->
 <!-- $theme: default -->
@@ -278,7 +278,7 @@ Voir `/usr/lib/python2.7/site-packages/salt/modules/test.py` sur le minion.
 
 ![bg 70%](./img/bg.png)
 
-# D'autres exempels d'exécution distante
+# D'autres exemples d'exécution distante
 
 `salt 'cible' module.fonction [arguments] [options salt]`
 
@@ -904,8 +904,6 @@ A la création de la VM, salt-minion est installé et attaché automatiquement a
 
 ---
 
-![bg 70%](./img/bg.png)
-
-<center><img src="./img/qrcode.jpg" height="600"></center>
+<center><img src="./img/qrcode.jpg" height="750"></center>
 
 <center><h1>Merci et à tout de suite !</h1></center>
