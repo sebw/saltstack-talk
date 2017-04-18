@@ -11,8 +11,8 @@ Disable any source of notification (chat, browsers, etc.)
 Deploy 3 VM and write down their IP:
 
 - master01 (prompt vert) : 10.1.1.____
-- minion01 (prompt jaune): 10.1.1.____
-- minion02 (prompt bleu): 10.1.1.____
+- minion01 1 CPU 1 GB RAM (prompt jaune): 10.1.1.____
+- minion02 2 CPU 1.5 GB RAM (prompt bleu): 10.1.1.____
 
 Vert export PS1="\[$(tput bold)\]\[$(tput setaf 2)\][\u@\h \W]\\$ \[$(tput sgr0)\]"
 Jaune export PS1="\[$(tput bold)\]\[$(tput setaf 3)\][\u@\h \W]\\$ \[$(tput sgr0)\]"
@@ -59,7 +59,7 @@ master: jdl-master
 - accept salt-minion keys : `salt-key -a jdl-minion*`
 - `salt '*' test.ping`
 - `salt '*' grains.items`
-- targetting based on grain: `salt -G 'os:CentOS' test.ping`
+- targetting based on grain: `salt -G 'mem_total:988' test.ping`
 
 ## Remote execution
 
