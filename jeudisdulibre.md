@@ -24,6 +24,18 @@ _20/04/2017_
 
 ![bg 70%](./img/bg.png)
 
+# Agenda
+
+## Présentation (~ 35 minutes)
+
+## Démonstration (~ 50 minutes)
+
+## Questions / réponses
+
+---
+
+![bg 70%](./img/bg.png)
+
 <!-- page_number: true -->
 
 # Qui suis-je ?
@@ -59,14 +71,14 @@ Contributeur Open Source
 
 ![bg 70%](./img/bg.png)
 
-# Ce qui m'a séduit par rapport à la concurrence
+# Les points forts
 
 - Orchestration "event-driven" via un bus d'événement `bus event`
 - Haute disponibilité du serveur maître `salt-master`
 - Ecrit en Python et développement de "plugins" facile
 - Configuration YAML et templating Jinja
 - Mode master/slave ou masterless
-- Gestion de configuraiton en mode push et/ou pull
+- Gestion de configuration en mode push et/ou pull
 - Salt Cloud pour instancier le serveur avant de gérer sa configuration
 - Salt API pour intégrer avec d'autres outils
 - Gestion de configuration, exécution à distance, récupération d'informations dans un seul package
@@ -77,10 +89,9 @@ Contributeur Open Source
 
 ![bg 70%](./img/bg.png)
 
-# Ce qui m'a séduit par rapport à la concurrence
+# Les points forts
 
-- SaltStack fourni des dépôts pour toutes les plateformes habituelles [0]
-- Support de Windows et MacOS
+- SaltStack fourni des dépôts pour les plateformes Linux habituelles, Windows et macOS [0]
 - Langage impératif ET déclaratif [1]
 - Salt SSH pour gérer les "dumb" devices qui embarquent Python 2.6+
 - Salt Proxy pour gérer certains "super dumb" devices sans stack Python
@@ -122,7 +133,7 @@ Contributeur Open Source
 `grains` : informations "statiques" des minions à disposition du master 
 `pillar` : informations dynamiques stockées sur le master à disposition des minions  
 `top.sls` : les fichiers d'assignation de `states` et `pillars` aux minions  
-`init.sls` : manifest d'un `state`, `pillar` 
+`init.sls` : fichier de déclaration d'un `state`, `pillar` 
 
 ---
 
@@ -162,9 +173,9 @@ Infrastructure as Code [0] : un bug dans le code = un downtime éventuel
 
 Nous sommes à présent des sysadmins développeurs :
 
+- Stocker le code dans un outil de gestion de versions (Git, etc.) 
 - Définir des guidelines de développement (syntaxe, structure, etc.)
 - Définir un workflow de développement (centralisé, par branche, par fork, etc.)
-- Stocker le code dans un outil de gestion de versions (Git, etc.) 
 
 Ne rien pousser en production qui n'a pas été testé et validé (principe des 4 yeux)
 
@@ -319,7 +330,7 @@ base:
 
 Appliquer le state `motd` sur tous les `minions`.
 
-Pour les minions dont le grain :
+Pour les minions dont le grain (info concernant le minion) :
 
 - "os" est `RedHat`, appliquer le state `selinux`.
 - "ETNIC_ROLE" est `frontend`, appliquer le state `elastic`.
@@ -702,7 +713,7 @@ hipchat:
 
 # Les beacons
 
-Monitoring de processus hors Salt
+Monitoring de processus hors Salt, configuré sur les **minions** /etc/salt/minion
 
 ```
 beacons:
