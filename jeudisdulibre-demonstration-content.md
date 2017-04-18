@@ -10,11 +10,15 @@ Disable any source of notification (chat, browsers, etc.)
 
 Deploy 3 VM and write down their IP:
 
-- master01 (prompt rouge) : 10.1.1.____
-- minion01 (prompt bleu): 10.1.1.____
-- minion02 (prompt vert): 10.1.1.____
+- master01 (prompt vert) : 10.1.1.____
+- minion01 (prompt jaune): 10.1.1.____
+- minion02 (prompt bleu): 10.1.1.____
 
-Colorize: https://www.kirsle.net/wizards/ps1.html
+Vert export PS1="\[$(tput bold)\]\[$(tput setaf 2)\][\u@\h \W]\\$ \[$(tput sgr0)\]"
+Jaune export PS1="\[$(tput bold)\]\[$(tput setaf 3)\][\u@\h \W]\\$ \[$(tput sgr0)\]"
+Bleu export PS1="\[$(tput bold)\]\[$(tput setaf 6)\][\u@\h \W]\\$ \[$(tput sgr0)\]"
+
+Colorize: [https://www.kirsle.net/wizards/ps1.html](https://www.kirsle.net/wizards/ps1.html)
 
 **Edit /etc/hosts on each**
 
