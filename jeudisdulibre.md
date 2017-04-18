@@ -700,6 +700,36 @@ hipchat:
 
 ![bg 70%](./img/bg.png)
 
+# Les beacons
+
+Monitoring de processus hors Salt
+
+```
+beacons:
+  inotify:
+    /etc/important_file: {}
+    disable_during_state_run: True
+    interval: 5
+```
+
+Un changement dans /etc/important_file déclenche un événement sur le bus :
+
+```
+salt/beacon/larry/inotify//etc/important_file       {
+ "_stamp": "2015-09-09T15:59:37.972753",
+ "data": {
+     "change": "IN_IGNORED",
+     "id": "larry",
+     "path": "/etc/important_file"
+ },
+ "tag": "salt/beacon/larry/inotify//etc/important_file"
+}
+```
+
+---
+
+![bg 70%](./img/bg.png)
+
 # Salt API
 
 Installation : `yum install salt-api --enablerepo=salt-latest`
