@@ -14,9 +14,14 @@ Deploy 3 VM and write down their IP:
 - minion01 1 CPU 1 GB RAM (prompt jaune): 10.1.1.____
 - minion02 2 CPU 1.5 GB RAM (prompt bleu): 10.1.1.____
 
-Vert export PS1="\[$(tput bold)\]\[$(tput setaf 2)\][\u@\h \W]\\$ \[$(tput sgr0)\]"
-Jaune export PS1="\[$(tput bold)\]\[$(tput setaf 3)\][\u@\h \W]\\$ \[$(tput sgr0)\]"
-Bleu export PS1="\[$(tput bold)\]\[$(tput setaf 6)\][\u@\h \W]\\$ \[$(tput sgr0)\]"
+```
+Green 
+export PS1="\[$(tput bold)\]\[$(tput setaf 2)\][\u@\h \W]\\$ \[$(tput sgr0)\]"
+Yellow 
+export PS1="\[$(tput bold)\]\[$(tput setaf 3)\][\u@\h \W]\\$ \[$(tput sgr0)\]"
+Blue 
+export PS1="\[$(tput bold)\]\[$(tput setaf 6)\][\u@\h \W]\\$ \[$(tput sgr0)\]"
+```
 
 Colorize: [https://www.kirsle.net/wizards/ps1.html](https://www.kirsle.net/wizards/ps1.html)
 
@@ -59,7 +64,8 @@ master: jdl-master
 - accept salt-minion keys : `salt-key -a jdl-minion*`
 - `salt '*' test.ping`
 - `salt '*' grains.items`
-- targetting based on grain: `salt -G 'mem_total:988' test.ping`
+- targetting based on grain: `salt -G 'mem_total:988' test.ping` (only one should return)
+- `salt -G 'num_cpus:1' test.ping`
 
 ## Remote execution
 
@@ -201,23 +207,7 @@ password={{ salt['pillar.get']('postfix:password2', 'valeur par defaut') }}
 
 Show events on master bus: `salt-run state.event pretty=True`
 
-Send a custom event on the bus from minion: `salt-call event.send /my/custom/event '{"data": "JDL"}'`
 
-```
-/my/custom/event	{
-    "_stamp": "2017-04-13T10:03:35.854050",
-    "cmd": "_minion_event",
-    "data": {
-        "__pub_fun": "event.send",
-        "__pub_jid": "20170413060330447842",
-        "__pub_pid": 3405,
-        "__pub_tgt": "salt-call",
-        "data": "JDL"
-    },
-    "id": "jdl-minion",
-    "tag": "/my/custom/even"
-}
-```
 
 Run: `salt 'jdl-minion' test.ping -v`
 
@@ -247,9 +237,25 @@ salt/job/20170411144701244715/ret/jdl-minion	{
 }
 ```
 
-Master conf
+Send a custom event on the bus from minion: `salt-call event.send /my/custom/event '{"data": "JDL"}'`
 
-/etc/salt/master:
+```
+/my/custom/event	{
+    "_stamp": "2017-04-13T10:03:35.854050",
+    "cmd": "_minion_event",
+    "data": {
+        "__pub_fun": "event.send",
+        "__pub_jid": "20170413060330447842",
+        "__pub_pid": 3405,
+        "__pub_tgt": "salt-call",
+        "data": "JDL"
+    },
+    "id": "jdl-minion",
+    "tag": "/my/custom/even"
+}
+```
+
+Master conf /etc/salt/master:
 
 ```
 reactor:
@@ -257,7 +263,7 @@ reactor:
     - /srv/salt/reactors/touch-jdl-minion2.sls
 ```
 
-Reactor on jdl-minion2 when jdl-minion returns something
+--> Reactor on jdl-minion2 when jdl-minion returns something
 
 /srv/salt/reactors/touch.sls
 
@@ -297,9 +303,7 @@ salt/beacon/jdl-minion/inotify//etc/passwd	{
 }
 ```
 	
-## Extending Salt
-
-
+## Extending Salt (custom grain)
 
 - custom grain from API (httpd)
 
@@ -339,6 +343,38 @@ Use custom-grain in motd.jinja
 ```
 {{ grains['zzz_custom']['custom-grain'] }}
 ```
+
+or better
+```
+{{ salt['grains.get']('zzz_custom:custom-grain') }}
+```
+
+## Extending Salt (custom module)
+
+`/srv/salt/states/_modules/jdl.py`
+
+```
+#!/usr/bin/env python
+
+import requests
+
+def public_ip():
+    r = requests.get('https://ip.wains.be')
+    out = r.content
+    return out
+```
+
+salt '*' saltutil.rsync_all
+
+```
+[root@master01 _modules]# salt '*' jdl.public_ip
+minion01:
+    8.8.8.8
+minion02:
+    8.8.4.4
+```
+
+Use custom module in motd.jinja `{{ salt['jdl.public_ip']() }}`
 
 ## Salt API
 
