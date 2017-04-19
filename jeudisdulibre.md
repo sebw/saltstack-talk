@@ -133,7 +133,7 @@ Contributeur Open Source
 `grains` : informations "statiques" des minions à disposition du master 
 `pillar` : informations dynamiques stockées sur le master à disposition des minions  
 `top.sls` : les fichiers d'assignation de `states` et `pillars` aux minions  
-`init.sls` : fichier de déclaration d'un `state`, `pillar` 
+`init.sls` : fichier de déclaration des `states` ou `pillars` 
 
 ---
 
@@ -891,9 +891,9 @@ A la création de la VM, salt-minion est installé et attaché automatiquement a
 
 ### Installation et configuration master et minion
 
-### Exécution distante
+### Exécution distante (modules)
 
-### Gestion de configuration
+### Gestion de configuration (states)
 
 ### Grains
 
@@ -903,9 +903,11 @@ A la création de la VM, salt-minion est installé et attaché automatiquement a
 
 ### Beacons
 
-### Création de grains avec infos depuis une API
+### Grains custom : stockage d'infos depuis une API
 
 ### Salt API
+
+### Modules custom
 
 ---
 
