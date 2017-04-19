@@ -1,2 +1,6 @@
 # saltstack-talk
-Slides for SaltStack presentation (made with [Marp](https://yhatt.github.io/marp/))
+Slides for my SaltStack presentation.
+
+Talk slides made with [Marp](https://yhatt.github.io/marp/) (PDF version available)
+
+Demo content is plain markdown.
