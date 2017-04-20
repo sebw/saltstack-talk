@@ -781,7 +781,7 @@ Démarrer Salt API : `systemctl start salt-api` ou `salt-api -l debug`
 
 # Reactors sur webhooks API
 
-Events sur le bus sur requêtes webhooks : `salt/netapi/*`
+Requête webhook = event sur le bus préfixé par le tag `salt/netapi/`
 
 https://github.com/saltstack-formulas/salt-api-reactor-formula
 
@@ -805,7 +805,7 @@ Possibilités :
 Possibilité : event sur le bus --> reactor --> requête vers une API
 
 Exemple :
-- ouverture automatique d'un ticket lors d'un événement sur le bus (beacons !)
+- ouverture automatique d'un ticket dans notre outil de ticketing en cas de charge trop élevée
 
 ---
 
@@ -822,13 +822,13 @@ Permet de créer des machines virtuelles à partir de profils, sur différentes 
 - Parallels
 - etc.
 
-Salt Cloud est installé avec le package salt-master.
-
 ---
 
 ![bg 70%](./img/bg.png)
 
 # Salt Cloud
+
+Installation : `yum install -y salt-cloud`
 
 Définir un "provider" sous `/etc/salt/cloud.providers.d/vmware.conf` :
 
