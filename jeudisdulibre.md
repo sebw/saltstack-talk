@@ -26,11 +26,13 @@ _20/04/2017_
 
 # Agenda
 
-## Présentation (~ 35 minutes)
+## Présentation (~ 40 minutes, ~ 40 slides)
 
 ## Démonstration (~ 50 minutes)
 
-## Questions / réponses
+## Questions / réponses (~ 10 minutes)
+
+## Verre de l'amitié + questions / réponses
 
 ---
 
@@ -813,7 +815,7 @@ Exemple :
 
 # Salt Cloud
 
-Permet de créer des machines virtuelles à partir de profils, sur différentes plateformes "cloud" et de virtualisation telles que :
+Permet de créer des machines virtuelles à partir de profils, sur différentes plateformes de virtualisation et de cloud telles que :
 - VMware 
 - Proxmox
 - Openshift
@@ -830,9 +832,11 @@ Permet de créer des machines virtuelles à partir de profils, sur différentes 
 
 Installation : `yum install -y salt-cloud`
 
+Pas de service à démarrer.
+
 Définir un "provider" sous `/etc/salt/cloud.providers.d/vmware.conf` :
 
-```
+```yaml
 vcenter01:
   driver: vmware
   user: 'DOMAIN\user'
@@ -848,18 +852,15 @@ vcenter01:
 
 # Salt Cloud
 
-Définir un "profile" sous `/etc/salt/cloud.profiles.d/vmware.conf` : 
+Définir des profils de VM sous `/etc/salt/cloud.profiles.d/vmware.conf` : 
 
 ```yaml
-vmware-centos7.3:
+vmware-centos7-small:
   provider: vcenter01
-  clonefrom: template-centos73
-  num_cpus: 4
-  memory: 8GB
+  clonefrom: template-centos7
+  num_cpus: 2
+  memory: 4GB
   devices:
-    disk:
-      Hard disk 2:
-        size: 20
     network:
       Network adapter 1:
         name: VLAN30
@@ -872,6 +873,10 @@ vmware-centos7.3:
     - 10.20.30.21
   script: bootstrap-salt
   script_args: -H proxy.example.org:8080 stable 2016.11
+  
+vmware-centos7-medium:
+  num_cpus: 4
+[...]
 ```
 
 ---
@@ -880,9 +885,9 @@ vmware-centos7.3:
 
 # Salt Cloud
 
-Instancier une VM :
+Instancier des VM :
 
-`salt-cloud -p vmware-centos7.3 vm01.example.com vm02.example.com`
+`salt-cloud -p vmware-centos7-small vm01.example.com vm02.example.com`
 
 A la création de la VM, salt-minion est installé et attaché automatiquement au master grâce au script bootstrap fourni par Salt (options `script` et `script_args`)
 
