@@ -123,7 +123,25 @@ Contributeur Open Source
 
 # Fonctionnement de base
 
-#### Glossaire
+- Un agent à installer sur les serveurs à gérer `salt-minion`
+- Un serveur maître `salt-master`
+- Les minions sont connectés constamment au master
+- Sur le master, deux ports écoutent et doivent être accessibles pour les minions
+
+<center><img src="./img/infra.png" height="250"></center>
+
+- A la première connexion d'un minion, le master doit accepter sa clé
+- Le salt-master peut tourner en utilisateur non privilégié
+- Le salt-minion doit tourner en root
+- Fonctionne avec SELinux en mode `Enforcing` actif sur le master et ses minions
+
+---
+
+![bg 70%](./img/bg.png)
+
+# Fonctionnement de base
+
+#### Vocabulaire
 
 `master` : serveur maître  
 `minion` : les agents contrôlés par le master 
@@ -141,27 +159,13 @@ Contributeur Open Source
 
 # Fonctionnement de base
 
-#### Glossaire
+#### Vocabulaire
 
 `beacons` : monitoring de processus hors Salt (charge système, modification fichiers, etc.) et envoi d'événement sur l'`event bus`  
 `reactors` : actions déclenchées en réaction à un événement sur l'`event bus` 
 `mine` : endroit sur le master où les minions poussent des informations à disposition des autres minions
 
----
 
-![bg 70%](./img/bg.png)
-
-# Fonctionnement de base
-
-- Les minions sont connectés constamment au master
-- Sur le master, deux ports écoutent et doivent être accessibles pour les minions
-
-<center><img src="./img/infra.png" height="250"></center>
-
-- A la première connexion d'un minion, le master doit accepter sa clé
-- Le salt-master peut tourner en utilisateur non privilégié
-- Le salt-minion doit tourner en root
-- Fonctionne avec SELinux en mode `Enforcing` actif sur le master et ses minions
 
 ---
 
@@ -197,11 +201,11 @@ Principe KISS : Keep It Simple, Stupid
 
 #### Sur le master :
 
-`yum install salt-master --enablerepo=salt-latest`
+`yum install -y salt-master`
 
 #### Sur les minions :
 
-`yum install salt-minion --enablerepo=salt-latest`
+`yum install -y salt-minion`
 
 
 ---
@@ -743,7 +747,7 @@ salt/beacon/larry/inotify//etc/important_file       {
 
 # Salt API
 
-Installation : `yum install salt-api --enablerepo=salt-latest`
+Installation sur le master : `yum install -y salt-api`
 
 Configuration /etc/salt/master.d/api.conf
 
@@ -767,7 +771,7 @@ rest_cherrypy:
   debug: False
 ```
 
-Redémarrer le master : `systemctl restart salt-master` (pour la partie auth)
+Redémarrer le master : `systemctl restart salt-master` (pour l'option `external_auth`)
 
 Démarrer Salt API : `systemctl start salt-api` ou `salt-api -l debug`
 
@@ -878,7 +882,7 @@ vmware-centos7.3:
 
 Instancier une VM :
 
-`salt-cloud -p vmware-centos7.3 nom-vm.example.com`
+`salt-cloud -p vmware-centos7.3 vm01.example.com vm02.example.com`
 
 A la création de la VM, salt-minion est installé et attaché automatiquement au master grâce au script bootstrap fourni par Salt (options `script` et `script_args`)
 
@@ -899,7 +903,7 @@ A la création de la VM, salt-minion est installé et attaché automatiquement a
 
 ### Pillars
 
-### Reactors
+### Event bus et reactors
 
 ### Beacons
 
