@@ -25,11 +25,11 @@ export PS1="\[$(tput bold)\]\[$(tput setaf 6)\][\u@\h \W]\\$ \[$(tput sgr0)\]"
 
 Colorize: [https://www.kirsle.net/wizards/ps1.html](https://www.kirsle.net/wizards/ps1.html)
 
-**Edit /etc/hosts on each**
+**Add node names in /etc/hosts on each node**
 
 **Disable firewall on master: systemctl stop firewalld**
 
-## Getting started
+## Installation + config
 
 - master and minions
 
@@ -58,10 +58,10 @@ pillar_roots:
 /etc/salt/minion
 
 ```
-master: jdl-master
+master: master01
 ```
 
-- accept salt-minion keys : `salt-key -a jdl-minion*`
+- accept salt-minion keys : `salt-key -a minion*`
 - `salt '*' test.ping`
 - `salt '*' grains.items`
 - targetting based on grain: `salt -G 'mem_total:988' test.ping` (only one should return)
@@ -104,14 +104,14 @@ Hello world
 
 ```
 base:
-  'jdl-minion':
+  '*':
     - motd
 ```
 
 Verif : salt '*' state.show_top
 
 ```
-jdl-minion:
+minion01:
     ----------
     base:
         - motd
@@ -123,7 +123,13 @@ jdl-minion:
 
 - reminder: `grains.items` and `grains.item grain_name`
 - jinja template: use `os` or `mem_total` grains
-- declare custom grain with multiple values `salt 'jdl-minion' grains.setval ROLE ['solr','apache']`
+- declare custom grain with multiple values 
+
+```
+salt 'minion01' grains.setval ROLE ['frontend','haproxy']
+salt 'minion02' grains.setval ROLE ['backend','apache']
+```
+
 - use custom grain in MOTD and display raw result first then prettify it with jinja logic
 
 ```
@@ -180,11 +186,11 @@ postfix:
 
 ```
 base:
-  'jdl-minion':
+  'minion01':
      - postfix
 ```
 
-salt 'jdl-minion' pillar.data
+salt '*' pillar.data
 
 Replace hardcoded "password=Truc" by "password={{ pillar['postfix']['password'] }}"
 
@@ -203,13 +209,13 @@ Show on a pillar that doesn't exist:
 password={{ salt['pillar.get']('postfix:password2', 'valeur par defaut') }}
 ```
 
-## Reactors
+## Event bus and reactors
 
 Show events on master bus: `salt-run state.event pretty=True`
 
 
 
-Run: `salt 'jdl-minion' test.ping -v`
+Run: `salt 'minion01' test.ping -v`
 
 ```
 salt/job/20170411144701244715/new	{
@@ -218,18 +224,18 @@ salt/job/20170411144701244715/new	{
     "fun": "test.ping",
     "jid": "20170411144701244715",
     "minions": [
-        "jdl-minion"
+        "minion01"
     ],
-    "tgt": "jdl-minion",
+    "tgt": "minion0",
     "tgt_type": "glob",
     "user": "root"
 }
-salt/job/20170411144701244715/ret/jdl-minion	{
+salt/job/20170411144701244715/ret/minion01	{
     "_stamp": "2017-04-11T18:47:01.351686",
     "cmd": "_return",
     "fun": "test.ping",
     "fun_args": [],
-    "id": "jdl-minion",
+    "id": "minion0",
     "jid": "20170411144701244715",
     "retcode": 0,
     "return": true,
@@ -250,7 +256,7 @@ Send a custom event on the bus from minion: `salt-call event.send /my/custom/eve
         "__pub_tgt": "salt-call",
         "data": "JDL"
     },
-    "id": "jdl-minion",
+    "id": "minion01",
     "tag": "/my/custom/even"
 }
 ```
@@ -259,29 +265,29 @@ Master conf /etc/salt/master:
 
 ```
 reactor:
-  - 'salt/job/*/ret/jdl-minion':
-    - /srv/salt/reactors/touch-jdl-minion2.sls
+  - 'salt/job/*/ret/minion01':
+    - /srv/salt/reactors/touch-minion02.sls
 ```
 
---> Reactor on jdl-minion2 when jdl-minion returns something
+--> Reactor on minion02 when minion0 returns something
 
 /srv/salt/reactors/touch.sls
 
 ```
 command_run:
   cmd.cmd.run:
-    - tgt: jdl-minion2
+    - tgt: minion02
     - arg:
       - "touch /tmp/touch.txt"
 ```
 
-salt 'jdl-minion1' test.ping
+salt 'minion01' test.ping
 
-See on jdl-minion2 /tmp/touch.txt
+See on minion02 /tmp/touch.txt
 
 ## Reactor on beacons
 
-yum install python-inotify sur minion (dep)
+`yum install python-inotify` on minions (dep)
 
 /etc/salt/minion.d/beacons.conf
 
@@ -295,10 +301,10 @@ beacons:
 Run `adduser jdl` on salt-minion and see event bus
 
 ```
-salt/beacon/jdl-minion/inotify//etc/passwd	{
+salt/beacon/minion0/inotify//etc/passwd	{
     "_stamp": "2017-04-11T19:08:18.505247",
     "change": "IN_IGNORED",
-    "id": "jdl-minion",
+    "id": "minion01",
     "path": "/etc/passwd"
 }
 ```
@@ -327,7 +333,7 @@ def custom_grain():
 	return grains
 ```
 
-salt 'jdl-minion' saltutil.sync_all
+salt '*' saltutil.sync_all
 
 Show minion logs
 
@@ -336,7 +342,7 @@ Show minion logs
 [DEBUG   ] "GET / HTTP/1.1" 200 34
 ```
 
-`salt 'jdl-minion' grains.item zzz_custom`
+`salt '*' grains.item zzz_custom`
 
 Use custom-grain in motd.jinja
 
@@ -378,7 +384,7 @@ Use custom module in motd.jinja `{{ salt['jdl.public_ip']() }}`
 
 ## Salt API
 
-`yum install salt-api`
+`yum install -y salt-api`
 
 Create local account `testapi` + pwd
 
@@ -403,9 +409,7 @@ rest_cherrypy:
 
 `systemctl restart salt-master` (for auth) and `salt-api -l debug`
 
-Start Postman and send 
-
-#### runner
+#### runner (using Postman)
 
 URL: `http://master01:8080/run`
 
@@ -420,7 +424,7 @@ headers:
 
 (no API event on the bus for runners)
 
-#### webhook
+#### webhook (using Postman)
 
 URL: `http://master01:8080/hook/test/jdl`
 
@@ -441,7 +445,7 @@ reactor:
 ```
 command_run:
   cmd.cmd.run:
-    - tgt: jdl-minion
+    - tgt: minion02
     - arg:
       - "touch /tmp/api-works.txt"
 ```
