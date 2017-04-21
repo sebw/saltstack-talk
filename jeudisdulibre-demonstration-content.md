@@ -2,12 +2,6 @@
 
 ## Before getting started
 
-Disable flux
-
-Enable caffeine
-
-Disable any source of notification (chat, browsers, etc.)
-
 Deploy 3 VM and write down their IP:
 
 - master01 (prompt vert) : 10.1.1.____
@@ -27,7 +21,7 @@ Colorize: [https://www.kirsle.net/wizards/ps1.html](https://www.kirsle.net/wizar
 
 **Add node names in /etc/hosts on each node**
 
-**Disable firewall on master: systemctl stop firewalld**
+**For demo disable firewall on master: systemctl stop firewalld**
 
 ## Installation + config
 
